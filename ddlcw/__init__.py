@@ -113,7 +113,7 @@ class Runner:
                                 uid=config.RUN_USER_UID,
                                 gid=config.RUN_GROUP_GID,
                                 memory_limit_check_only=self._run_config.get("memory_limit_check_only", 0))
-        run_result['memory'] = round(run_result['memory'] / 1024 / 1024, 2)
+        run_result['memory'] = run_result['memory'] // 1024 // 1024
 
         if run_result["result"] == config.RESULT_SUCCESS:
             if not os.path.exists(run_out_file_path):
