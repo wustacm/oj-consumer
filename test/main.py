@@ -2,8 +2,8 @@ from ddlcw import Runner
 from ddlcw.languages import c_lang_config
 
 
-def main(test_case_dir, manifest, code):
-    runner = Runner(test_case_dir, manifest, 1, 32, code, c_lang_config)
+def main(test_case_dir, manifest_param, code_param):
+    runner = Runner(test_case_dir, manifest_param, 1, 32, code_param, c_lang_config)
     print(runner.compile())
     print(runner.run())
 
