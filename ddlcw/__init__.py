@@ -2,14 +2,28 @@ import json
 import os
 import subprocess
 import uuid
-from multiprocessing import Pool
-
+import multiprocessing
 import psutil
 
 from ddlcw import config
 from ddlcw import runner
 from ddlcw.exceptions import CompileError, JudgeError
 from ddlcw import languages
+
+
+class NoDaemonProcess(multiprocessing.Process):
+    # make 'daemon' attribute always return False
+    def _get_daemon(self):
+        return False
+
+    def _set_daemon(self, value):
+        pass
+
+    daemon = property(_get_daemon, _set_daemon)
+
+
+class MyPool(multiprocessing.pool.Pool):
+    Process = NoDaemonProcess
 
 
 def _run(instance, test_case):
@@ -49,7 +63,7 @@ class Runner:
         self._spj_version = 'ver1'
         self._run_config = language_config['run']
         self._run_log = os.path.join(self._runner_path, "run.log")
-        self._pool = Pool(processes=psutil.cpu_count())
+        self._pool = MyPool(processes=psutil.cpu_count())
         if self._manifest['spj'] is True:
             self._spj = True
             self._spj_code = self._manifest['spj_code']
