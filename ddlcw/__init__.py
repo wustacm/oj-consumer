@@ -9,6 +9,7 @@ from ddlcw import config
 from ddlcw import runner
 from ddlcw.exceptions import CompileError, JudgeError
 from ddlcw import languages
+import multiprocessing.pool
 
 
 class NoDaemonProcess(multiprocessing.Process):
@@ -22,7 +23,7 @@ class NoDaemonProcess(multiprocessing.Process):
     daemon = property(_get_daemon, _set_daemon)
 
 
-class MyPool(multiprocessing.Pool):
+class MyPool(multiprocessing.pool.Pool):
     Process = NoDaemonProcess
 
 
