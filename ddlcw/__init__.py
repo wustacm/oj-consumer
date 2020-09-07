@@ -2,18 +2,12 @@ import json
 import os
 import subprocess
 import uuid
-from multiprocessing import Pool
-
-import psutil
 
 from ddlcw import config
+from ddlcw import languages
 from ddlcw import runner
 from ddlcw.exceptions import CompileError, JudgeError
-from ddlcw import languages
-
-
-def _run(instance, test_case):
-    return instance._judge_single(test_case)
+import shutil
 
 
 class Runner:
@@ -49,7 +43,6 @@ class Runner:
         self._spj_version = 'ver1'
         self._run_config = language_config['run']
         self._run_log = os.path.join(self._runner_path, "run.log")
-        self._pool = Pool(processes=psutil.cpu_count())
         if self._manifest['spj'] is True:
             self._spj = True
             self._spj_code = self._manifest['spj_code']
@@ -129,7 +122,7 @@ class Runner:
                     os.remove(self._compiler_out)
                     if error:
                         raise CompileError(error)
-            raise CompileError("Compiler runtime error, info: %s" % json.dumps(result))
+            raise CompileError("Compiler runtime error, info: \n%s\n" % json.dumps(result))
         else:
             if os.path.exists(self._compiler_out):
                 os.remove(self._compiler_out)
@@ -196,17 +189,10 @@ class Runner:
         return config.RESULT_WRONG_ANSWER
 
     def run(self):
-        tmp_result = []
         result = []
         for item in self._manifest['test_cases']:
-            tmp_result.append(self._pool.apply_async(_run, (self, item)))
-        self._pool.close()
-        self._pool.join()
-        for item in tmp_result:
-            result.append(item.get())
+            result.append(self._judge_single(item))
         return result
 
-    def __getstate__(self):
-        self_dict = self.__dict__.copy()
-        del self_dict["_pool"]
-        return self_dict
+    def clean(self):
+        shutil.rmtree(self._runner_path, ignore_errors=True)

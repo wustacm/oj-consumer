@@ -17,4 +17,4 @@ if __name__ == '__main__':
     }
     with open('./1/test.c', 'r') as f:
         code = f.read()
-    main('./1', manifest, code)
+    main('/test_cases', manifest, code)
