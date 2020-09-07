@@ -13,7 +13,7 @@ import shutil
 class Runner:
     def __init__(self, test_case_dir, manifest, time_limit, memory_limit, code, language_config):
         # test cases file list
-        # {'hash':'','test_cases':[{'in': '1.in', 'out': '1.out'},{'in': '2.in', 'out': '2.out'}], 'spj': true, 'spj_code':''}
+        # {'hash':'','test_cases':[{'in': '1.in', 'out': '1.out'},{'in': '2.in', 'out': '2.out'}], 'spj': true, 'spj_code': '#include<stdio.h>\nint main(){\n   return 0;\n}\n'}
         self._manifest = manifest
         self._test_cases_dir = os.path.join(test_case_dir, self._manifest['hash'])
         # int, unit is ms
