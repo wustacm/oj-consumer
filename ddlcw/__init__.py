@@ -74,11 +74,13 @@ class Runner:
                                         seccomp_rule_name=None,
                                         uid=config.RUN_USER_UID,
                                         gid=config.RUN_GROUP_GID)
+        if config.DEBUG:
+            print('spj_compile_result')
+            print(spj_compile_result)
         if spj_compile_result["result"] != config.RESULT_SUCCESS:
             if os.path.exists(self._compiler_out):
                 with open(self._compiler_out, encoding="utf-8") as f:
                     error = f.read().strip()
-                    os.remove(self._compiler_out)
                     if error:
                         raise CompileError('Compile spj error.\n' + error)
             raise CompileError("Compile spj runtime error, info:\n%s" % json.dumps(spj_compile_result))
@@ -109,17 +111,17 @@ class Runner:
                             seccomp_rule_name=None,
                             uid=config.RUN_USER_UID,
                             gid=config.RUN_GROUP_GID)
+        if config.DEBUG:
+            print('compile result')
+            print(result)
         if result["result"] != config.RESULT_SUCCESS:
             if os.path.exists(self._compiler_out):
                 with open(self._compiler_out, encoding="utf-8") as f:
                     error = f.read().strip()
-                    os.remove(self._compiler_out)
                     if error:
                         raise CompileError(error)
             raise CompileError("Compiler runtime error, info: \n%s\n" % json.dumps(result))
         else:
-            if os.path.exists(self._compiler_out):
-                os.remove(self._compiler_out)
             return self._exe_path
 
     def _judge_single_spj(self, input_path, output_path, test_case):
@@ -150,6 +152,9 @@ class Runner:
                                 uid=config.RUN_USER_UID,
                                 gid=config.RUN_GROUP_GID,
                                 memory_limit_check_only=self._run_config.get("memory_limit_check_only", 0))
+        if config.DEBUG:
+            print('run spj result')
+            print(run_result)
         return run_result
 
     def _judge_single(self, test_case):
@@ -184,6 +189,9 @@ class Runner:
                                 gid=config.RUN_GROUP_GID,
                                 memory_limit_check_only=self._run_config.get("memory_limit_check_only", 0))
         run_result['memory'] = run_result['memory'] // 1024 // 1024
+        if config.DEBUG:
+            print('run result')
+            print(run_result)
         if run_result["result"] != config.RESULT_SUCCESS:
             return run_result
         if self._spj:

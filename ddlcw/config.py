@@ -1,5 +1,6 @@
 import grp
 import pwd
+import os
 
 UNLIMITED = -1
 VERSION = 0x020101
@@ -26,6 +27,7 @@ ERROR_EXECVE_FAILED = -10
 ERROR_SPJ_ERROR = -11
 
 RUNNER_DIR = "/runner"
-TEST_CASES_DIR='/test_cases'
+TEST_CASES_DIR = '/test_cases'
 RUN_USER_UID = pwd.getpwnam("code").pw_uid
 RUN_GROUP_GID = grp.getgrnam("code").gr_gid
+DEBUG = os.getenv('DEBUG') or False
