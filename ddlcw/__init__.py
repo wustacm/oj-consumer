@@ -32,8 +32,8 @@ class Runner:
         if not os.path.exists(self._runner_path):
             os.makedirs(self._runner_path)
             os.chown(self._runner_path, config.RUN_USER_UID, config.RUN_GROUP_GID)
-        self._compiler_out = os.path.join(self._runner_path, "compiler.out")
-        self._compiler_log = os.path.join(self._runner_path, "compiler.log")
+        self._compiler_out = '/dev/stderr'
+        self._compiler_log = '/dev/stdout'
         self._spj = False
         self._spj_code = ''
         self._spj_src_path = ''
