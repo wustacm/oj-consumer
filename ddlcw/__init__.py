@@ -131,7 +131,7 @@ class Runner:
         env = ["PATH=" + os.environ.get("PATH", "")]
         seccomp_rule = languages.c_lang_spj_config["seccomp_rule"]
         in_file_path = os.path.join(self._test_cases_dir, test_case['in'])
-
+        os.chown(output_path, config.RUN_USER_UID, config.RUN_GROUP_GID)
         # run test case output path & run test case error path
         run_out_file_path = os.path.join(self._runner_path, test_case['out'] + '.spj')
         run_out_err_path = os.path.join(self._runner_path, test_case['in'] + '.err.spj')
@@ -201,7 +201,7 @@ class Runner:
             elif spj_run_result['exit_code'] == 1:
                 run_result['result'] = config.RESULT_WRONG_ANSWER
             else:
-                run_result['result'] = config.RESULT_RUNTIME_ERROR
+                run_result['result'] = config.RESULT_SYSTEM_ERROR
         else:
             if not os.path.exists(run_out_file_path):
                 run_result["result"] = config.RESULT_WRONG_ANSWER
