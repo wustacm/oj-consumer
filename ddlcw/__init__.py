@@ -12,10 +12,10 @@ import shutil
 
 class Runner:
     def __init__(self, test_case_dir, manifest, time_limit, memory_limit, code, language_config):
-        # test cases file list
-        # {'hash':'','test_cases':[{'in': '1.in', 'out': '1.out'},{'in': '2.in', 'out': '2.out'}], 'spj': true, 'spj_code':''}
+        # test cases file list {'hash':'','test_cases':[{'in': '1.in', 'out': '1.out'},{'in': '2.in',
+        # 'out': '2.out'}], 'spj': true, 'spj_code':''}
         self._manifest = manifest
-        self._test_cases_dir = os.path.join(test_case_dir, self._manifest['hash'])
+        self._test_cases_dir = os.path.abspath(os.path.join(test_case_dir, self._manifest['hash']))
         # int, unit is ms
         self._time_limit = time_limit
         # int, unit is MB
@@ -40,18 +40,15 @@ class Runner:
         self._spj_code = ''
         self._spj_src_path = ''
         self._spj_exe_path = ''
-        self._spj_version = 'ver1'
         self._run_config = language_config['run']
         self._run_log = os.path.join(self._runner_path, "run.log")
         if self._manifest['spj'] is True:
             self._spj = True
             self._spj_code = self._manifest['spj_code']
             self._spj_src_path = os.path.join(self._runner_path,
-                                              languages.c_lang_spj_compile['src_path']).format(
-                spj_version=self._spj_version)
+                                              languages.c_lang_spj_compile['src_name'])
             self._spj_exe_path = os.path.join(self._runner_path,
-                                              languages.c_lang_spj_compile['exe_path']).format(
-                spj_version=self._spj_version)
+                                              languages.c_lang_spj_compile['exe_name'])
             with open(self._spj_src_path, 'w') as f:
                 f.write(self._spj_code)
 
@@ -61,7 +58,8 @@ class Runner:
         command = command.format(src_path=self._spj_src_path, exe_path=self._spj_exe_path)
         _command = command.split(' ')
         os.chdir(self._runner_path)
-        env = 'PATH=' + os.getenv('PATH')
+        env = compile_config.get("env", [])
+        env.append("PATH=" + os.getenv("PATH"))
         spj_compile_result = runner.run(max_cpu_time=compile_config['max_cpu_time'],
                                         max_real_time=compile_config['max_real_time'],
                                         max_memory=compile_config['max_memory'],
@@ -84,14 +82,14 @@ class Runner:
                     error = f.read().strip()
                     os.remove(self._compiler_out)
                     if error:
-                        raise CompileError(error)
-            raise CompileError("Compiler runtime error, info: %s" % json.dumps(spj_compile_result))
+                        raise CompileError('Compile spj error.\n' + error)
+            raise CompileError("Compile spj runtime error, info:\n%s" % json.dumps(spj_compile_result))
         else:
-            if os.path.exists(self._compiler_out):
-                os.remove(self._compiler_out)
             return self._spj_exe_path
 
     def compile(self):
+        if self._spj:
+            self._compile_spj()
         compile_config = self._language_config['compile']
         command = compile_config["compile_command"]
         command = command.format(src_path=self._src_path, exe_dir=self._runner_path, exe_path=self._exe_path)
@@ -128,6 +126,36 @@ class Runner:
                 os.remove(self._compiler_out)
             return self._exe_path
 
+    def _judge_single_spj(self, input_path, output_path, test_case):
+        command = languages.c_lang_spj_config['command'].format(exe_path=self._spj_exe_path,
+                                                                in_file_path=input_path,
+                                                                user_out_file_path=output_path).split(" ")
+        env = ["PATH=" + os.environ.get("PATH", "")]
+        seccomp_rule = languages.c_lang_spj_config["seccomp_rule"]
+        in_file_path = os.path.join(self._test_cases_dir, test_case['in'])
+
+        # run test case output path & run test case error path
+        run_out_file_path = os.path.join(self._runner_path, test_case['out'] + '.spj')
+        run_out_err_path = os.path.join(self._runner_path, test_case['in'] + '.err.spj')
+        run_result = runner.run(max_cpu_time=self._time_limit * 3,
+                                max_real_time=self._time_limit * 9,
+                                max_memory=self._memory_limit * 1024 * 1024,
+                                max_stack=128 * 1024 * 1024,
+                                max_output_size=1024 * 1024 * 16,
+                                max_process_number=config.UNLIMITED,
+                                exe_path=command[0],
+                                args=command[1::],
+                                env=env,
+                                input_path=in_file_path,
+                                output_path=run_out_file_path,
+                                error_path=run_out_err_path,
+                                log_path=self._run_log,
+                                seccomp_rule_name=seccomp_rule,
+                                uid=config.RUN_USER_UID,
+                                gid=config.RUN_GROUP_GID,
+                                memory_limit_check_only=self._run_config.get("memory_limit_check_only", 0))
+        return run_result
+
     def _judge_single(self, test_case):
         # test case input and output path
         in_file_path = os.path.join(self._test_cases_dir, test_case['in'])
@@ -160,8 +188,17 @@ class Runner:
                                 gid=config.RUN_GROUP_GID,
                                 memory_limit_check_only=self._run_config.get("memory_limit_check_only", 0))
         run_result['memory'] = run_result['memory'] // 1024 // 1024
-
-        if run_result["result"] == config.RESULT_SUCCESS:
+        if run_result["result"] != config.RESULT_SUCCESS:
+            return run_result
+        if self._spj:
+            spj_run_result = self._judge_single_spj(in_file_path, run_out_file_path, test_case)
+            if spj_run_result['exit_code'] == 0:
+                run_result['result'] = spj_run_result['result']
+            elif spj_run_result['exit_code'] == 1:
+                run_result['result'] = config.RESULT_WRONG_ANSWER
+            else:
+                run_result['result'] = config.RESULT_RUNTIME_ERROR
+        else:
             if not os.path.exists(run_out_file_path):
                 run_result["result"] = config.RESULT_WRONG_ANSWER
             else:

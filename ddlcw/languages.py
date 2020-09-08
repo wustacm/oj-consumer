@@ -88,8 +88,8 @@ go_lang_config = {
 }
 
 c_lang_spj_compile = {
-    "src_name": "spj-{spj_version}.c",
-    "exe_name": "spj-{spj_version}",
+    "src_name": "spj.c",
+    "exe_name": "spj",
     "max_cpu_time": 3000,
     "max_real_time": 5000,
     "max_memory": 1024 * 1024 * 1024,
@@ -97,7 +97,7 @@ c_lang_spj_compile = {
 }
 
 c_lang_spj_config = {
-    "exe_name": "spj-{spj_version}",
+    "exe_name": "spj",
     "command": "{exe_path} {in_file_path} {user_out_file_path}",
     "seccomp_rule": "c_cpp"
 }
