@@ -82,8 +82,6 @@ class Runner:
                     if error:
                         raise CompileError('Compile spj error.\n' + error)
             raise CompileError("Compile spj runtime error, info:\n%s" % json.dumps(spj_compile_result))
-        else:
-            return self._spj_exe_path
 
     def compile(self):
         if self._spj:
