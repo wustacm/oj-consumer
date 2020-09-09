@@ -11,6 +11,7 @@ import shutil
 
 
 class Runner:
+    # 初始化一个运行的Runner
     def __init__(self, test_case_dir, manifest, time_limit, memory_limit, code, language_config):
         self._manifest = manifest
         self._test_cases_dir = os.path.abspath(os.path.join(test_case_dir, self._manifest['hash']))
@@ -49,7 +50,7 @@ class Runner:
                                               languages.c_lang_spj_compile['exe_name'])
             with open(self._spj_src_path, 'w') as f:
                 f.write(self._spj_code)
-
+    # 编译SPJ代码
     def _compile_spj(self):
         compile_config = languages.c_lang_spj_compile
         command = compile_config['compile_command']
@@ -84,7 +85,7 @@ class Runner:
                     if error:
                         raise CompileError('Compile spj error.\n' + error)
             raise CompileError("Compile spj runtime error, info:\n%s" % json.dumps(spj_compile_result))
-
+    # 编译用户代码
     def compile(self):
         if self._spj:
             self._compile_spj()
@@ -123,8 +124,9 @@ class Runner:
             raise CompileError("Compiler runtime error, info: \n%s\n" % json.dumps(result))
         else:
             return self._exe_path
-
+    # 运行单个测试样例的SPJ代码
     def _judge_single_spj(self, input_path, output_path, test_case):
+        # 将输入数据拷贝到运行目录下面，并且分配权限
         spj_in_file_path = os.path.join(self._runner_path, test_case['in'])
         shutil.copyfile(input_path, spj_in_file_path)
         os.chown(spj_in_file_path, config.RUN_USER_UID, config.RUN_GROUP_GID)
@@ -159,7 +161,7 @@ class Runner:
             print('run spj result')
             print(run_result)
         return run_result
-
+    # 运行单个测试样例
     def _judge_single(self, test_case):
         # test case input and output path
         in_file_path = os.path.join(self._test_cases_dir, test_case['in'])
@@ -213,6 +215,7 @@ class Runner:
 
     # if output is PE or AC or WA ?
     # reference to: https://github.com/4ddl/docs/blob/master/err.md
+    # 比较用户的输出结果是否正确，可以判断PE，WA或者AC。
     @staticmethod
     def diff(standard_path, output_path):
         args1 = ['diff', '-Z', standard_path, output_path]
@@ -230,7 +233,7 @@ class Runner:
         if not out:
             return config.RESULT_PRESENTATION_ERROR
         return config.RESULT_WRONG_ANSWER
-
+    # 运行所有数据
     def run(self):
         result = []
         for item in self._manifest['test_cases']:
