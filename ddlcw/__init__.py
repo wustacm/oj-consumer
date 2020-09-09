@@ -125,8 +125,11 @@ class Runner:
             return self._exe_path
 
     def _judge_single_spj(self, input_path, output_path, test_case):
+        spj_in_file_path = os.path.join(self._runner_path, test_case['in'])
+        shutil.copyfile(input_path, spj_in_file_path)
+        os.chown(spj_in_file_path, config.RUN_USER_UID, config.RUN_GROUP_GID)
         command = languages.c_lang_spj_config['command'].format(exe_path=self._spj_exe_path,
-                                                                in_file_path=input_path,
+                                                                in_file_path=spj_in_file_path,
                                                                 user_out_file_path=output_path).split(" ")
         env = ["PATH=" + os.environ.get("PATH", "")]
         seccomp_rule = languages.c_lang_spj_config["seccomp_rule"]
@@ -161,7 +164,6 @@ class Runner:
         # test case input and output path
         in_file_path = os.path.join(self._test_cases_dir, test_case['in'])
         out_file_path = os.path.join(self._test_cases_dir, test_case['out'])
-
         # run test case output path & run test case error path
         run_out_file_path = os.path.join(self._runner_path, test_case['out'])
         run_out_err_path = os.path.join(self._runner_path, test_case['in'] + '.err')
