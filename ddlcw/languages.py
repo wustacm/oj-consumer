@@ -41,17 +41,36 @@ java_lang_config = {
         "max_cpu_time": 3000,
         "max_real_time": 5000,
         "max_memory": -1,
-        "compile_command": "/usr/bin/javac {src_path} -d {exe_dir} -encoding UTF8"
+        "compile_command": "/usr/local/sdkman/candidates/java/current/bin/javac {src_path} -d {exe_dir} -encoding UTF8",
+        "env": default_env + ['JAVA_HOME=/usr/local/sdkman/candidates/java/current']
     },
     "run": {
-        "command": "/usr/bin/java -cp {exe_dir} -XX:MaxRAM={max_memory}k -Djava.security.manager "
-                   "-Dfile.encoding=UTF-8 -Djava.security.policy==/etc/java_policy -Djava.awt.headless=true Main",
+        "command": "/usr/local/sdkman/candidates/java/current/bin/java -cp {exe_dir} -XX:MaxRAM={max_memory}k -Djava.security.manager "
+                   "-Dfile.encoding=UTF-8 -Djava.security.policy=/etc/java_policy -Djava.awt.headless=true Main",
         "seccomp_rule": None,
-        "env": default_env,
+        "env": default_env + ['JAVA_HOME=/usr/local/sdkman/candidates/java/current'],
         "memory_limit_check_only": 1
     }
 }
-
+kotlin_lang_config = {
+    "name": "kotlin",
+    "compile": {
+        "src_name": "main.kt",
+        "exe_name": "main.jar",
+        "max_cpu_time": 6000,
+        "max_real_time": 10000,
+        "max_memory": -1,
+        "compile_command": "/usr/local/sdkman/candidates/kotlin/current/bin/kotlinc {src_path} -include-runtime -d {exe_path}",
+        "env": default_env + ['JAVA_HOME=/usr/local/sdkman/candidates/java/current'],
+    },
+    "run": {
+        "command": "/usr/local/sdkman/candidates/java/current/bin/java -cp {exe_dir} -XX:MaxRAM={max_memory}k -Djava.security.manager "
+                   "-Dfile.encoding=UTF-8 -Djava.security.policy=/etc/java_policy -Djava.awt.headless=true -jar {exe_path}",
+        "seccomp_rule": None,
+        "env": default_env + ['JAVA_HOME=/usr/local/sdkman/candidates/java/current'],
+        "memory_limit_check_only": 1
+    }
+}
 py3_lang_config = {
     "compile": {
         "src_name": "solution.py",

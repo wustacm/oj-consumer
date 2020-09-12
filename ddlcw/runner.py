@@ -25,7 +25,8 @@ def run(max_cpu_time,
     int_vars = ["max_cpu_time", "max_real_time",
                 "max_memory", "max_stack", "max_output_size",
                 "max_process_number", "uid", "gid", "memory_limit_check_only"]
-    str_vars = ["exe_path", "input_path", "output_path", "error_path", "log_path"]
+    str_vars = ["exe_path", "input_path",
+                "output_path", "error_path", "log_path"]
 
     proc_args = ["ddlc"]
 
@@ -55,8 +56,12 @@ def run(max_cpu_time,
         raise ValueError("seccomp_rule_name must be a string or None")
     if seccomp_rule_name:
         proc_args.append("--seccomp_rule={}".format(seccomp_rule_name))
-    proc = subprocess.Popen(proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    print(' '.join(proc_args))
+    proc = subprocess.Popen(
+        proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
     out, err = proc.communicate()
     if err:
         raise ValueError("Error occurred while calling ddlc: {}".format(err))
+
     return json.loads(out.decode("utf-8"))
