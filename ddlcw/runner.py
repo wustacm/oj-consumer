@@ -56,7 +56,6 @@ def run(max_cpu_time,
         raise ValueError("seccomp_rule_name must be a string or None")
     if seccomp_rule_name:
         proc_args.append("--seccomp_rule={}".format(seccomp_rule_name))
-    print(' '.join(proc_args))
     proc = subprocess.Popen(
         proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
