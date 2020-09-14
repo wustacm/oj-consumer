@@ -1,3 +1,6 @@
 .idea/
 venv/
 build/
+**/data/
+**/__pycache__/
+**/judge/

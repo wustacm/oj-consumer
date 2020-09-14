@@ -1,7 +1,12 @@
 import grp
 import os
 import pwd
+import traceback
 
+if os.getenv('ddlcw_env', 'production') == 'development':
+    DDLCW_DEBUG = True
+else:
+    DDLCW_DEBUG = False
 UNLIMITED = -1
 
 ACCEPT_SUBMISSION_LANGUAGES = ['c', 'cpp', 'java', 'go', 'python', 'kotlin']
@@ -33,6 +38,7 @@ class Verdict:
     PENDING = 'P'
     RUNNING = 'R'
     ACCEPTED = 'AC'
+    SYNC_TEST_CASES = 'SYNC'
     PRESENTATION_ERROR = 'PE'
     TIME_LIMIT_EXCEEDED = 'TLE'
     MEMORY_LIMIT_EXCEEDED = 'MLE'
@@ -53,11 +59,31 @@ class Verdict:
     }
 
 
-RUNNER_DIR = "/runner"
-TEST_CASES_DIR = '/test_cases'
+if DDLCW_DEBUG:
+    BASE_DIR = os.path.abspath('./judge')
+    TMP_DIR = os.path.join(BASE_DIR, 'tmp')
+else:
+    BASE_DIR = '/judge'
+    TMP_DIR = '/tmp'
+
+RUNNER_DIR = os.path.join(BASE_DIR, 'runner')
+UPLOAD_DIR = os.path.join(BASE_DIR, 'upload')
+
+PROBLEM_TEST_CASES_DIR = os.path.join(BASE_DIR, 'test_cases')
+
+try:
+    os.makedirs(RUNNER_DIR, exist_ok=True)
+    os.makedirs(UPLOAD_DIR, exist_ok=True)
+    os.makedirs(TMP_DIR, exist_ok=True)
+except Exception:
+    traceback.print_exc()
+
 RUN_USER_UID = pwd.getpwnam("code").pw_uid
 RUN_GROUP_GID = grp.getgrnam("code").gr_gid
-DEBUG = os.getenv('DDLCW_DEBUG') or False
-UPLOAD_DIR = '/upload'
-TMP_DIR = '/tmp'
-PROBLEM_TEST_CASES_DIR = os.path.join(UPLOAD_DIR, 'problem_test_cases')
+# tasks producer queue
+BROKER_URL = f"amqp://{os.getenv('RABBITMQ_USER', 'guest')}:{os.getenv('RABBITMQ_PASS', 'guest')}" \
+             f"@{os.getenv('RABBITMQ_HOST', '127.0.0.1')}:{os.getenv('RABBITMQ_PORT', 5672)}/"
+BACKEND_BASE_URL = f"{os.getenv('BACKEND_PROTOCOL', 'http')}://" \
+                   f"{os.getenv('BACKEND_HOST', '127.0.0.1')}:{os.getenv('BACKEND_PORT', 8000)}"
+BACKEND_SYNC_TEST_CASES_URL = BACKEND_BASE_URL + '/api/problem/{problem_id}/sync_test_cases/'
+JUDGE_TOKEN = os.getenv('JUDGE_TOKEN', 'JUDGE_TOKEN')

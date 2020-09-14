@@ -3,13 +3,13 @@ import traceback
 from celery import Celery
 
 from ddlcw import Runner as JudgeRunner
-from ddlcw.config import Verdict, ACCEPT_SUBMISSION_LANGUAGES
-from distribute.config import PROBLEM_TEST_CASES_DIR
-from distribute.utils import validate_manifest, ManifestError, load_submission_config, load_spj_config
-import os
+from ddlcw.config import Verdict, ACCEPT_SUBMISSION_LANGUAGES, PROBLEM_TEST_CASES_DIR, BROKER_URL, DDLCW_DEBUG
+from ddlcw.utils import load_spj_config, load_submission_config, validate_manifest, ManifestError, TestCaseError, \
+    sync_test_cases
 
-app = Celery('tasks', broker_url=f'amqp://guest:guest@{os.getenv("RABBITMQ_HOST", "127.0.0.1")}:5672/')
+app = Celery('tasks')
 app.conf.update(
+    broker_url=BROKER_URL,
     enable_utc=True,
     task_serializer='json',
     timezone='UTC'
@@ -22,7 +22,7 @@ def result_submission_task(submission_id, verdict, time_spend, memory_spend, add
 
 
 @app.task(name='run_submission_task')
-def run_submission_task(submission_id, manifest, code, language, time_limit, memory_limit):
+def run_submission_task(submission_id, problem_id, manifest, code, language, time_limit, memory_limit):
     result_submission_task.apply_async(args=[submission_id, Verdict.RUNNING, None, None, {}], queue='result')
     if language not in ACCEPT_SUBMISSION_LANGUAGES:
         result_submission_task.apply_async(
@@ -31,6 +31,20 @@ def run_submission_task(submission_id, manifest, code, language, time_limit, mem
     # initialize runner
     try:
         validate_manifest(manifest)
+    except TestCaseError:
+        if DDLCW_DEBUG:
+            print('--------------------------------------- validate manifest error -----------------------------------')
+            traceback.print_exc()
+        result_submission_task.apply_async(args=[submission_id, Verdict.SYNC_TEST_CASES, None, None, {}],
+                                           queue='result')
+        try:
+            sync_test_cases(manifest['hash'], problem_id)
+            validate_manifest(manifest)
+        except ManifestError as e:
+            traceback.print_exc()
+            result_submission_task.apply_async(
+                args=[submission_id, Verdict.SYSTEM_ERROR, None, None, {'error': repr(e)}], queue='result')
+            return
     except ManifestError as e:
         traceback.print_exc()
         result_submission_task.apply_async(

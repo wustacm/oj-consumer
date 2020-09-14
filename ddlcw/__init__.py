@@ -21,7 +21,6 @@ class Runner:
         self._time_limit = time_limit
         # int, unit is MB
         self._memory_limit = memory_limit
-        print(language_config)
         self._compile_config = language_config['compile']
         self._language_config = language_config
         self._runner_path = os.path.join(config.RUNNER_DIR, str(uuid.uuid4()))
@@ -86,8 +85,8 @@ class Runner:
                                         seccomp_rule_name=None,
                                         uid=config.RUN_USER_UID,
                                         gid=config.RUN_GROUP_GID)
-        if config.DEBUG:
-            print('spj_compile_result')
+        if config.DDLCW_DEBUG:
+            print('---------------------------------------- spj compile result -------------------------------')
             print(spj_compile_result)
         if spj_compile_result["result"] != config.RESULT_SUCCESS:
             if os.path.exists(self._compiler_out):
@@ -127,8 +126,8 @@ class Runner:
                             seccomp_rule_name=None,
                             uid=config.RUN_USER_UID,
                             gid=config.RUN_GROUP_GID)
-        if config.DEBUG:
-            print('compile result')
+        if config.DDLCW_DEBUG:
+            print('---------------------------------------- compile result -------------------------------')
             print(result)
         if result["result"] != config.RESULT_SUCCESS:
             if os.path.exists(self._compiler_out):
@@ -177,8 +176,8 @@ class Runner:
                                 uid=config.RUN_USER_UID,
                                 gid=config.RUN_GROUP_GID,
                                 memory_limit_check_only=self._run_config.get("memory_limit_check_only", 0))
-        if config.DEBUG:
-            print('run spj result')
+        if config.DDLCW_DEBUG:
+            print('---------------------------------------- run spj result -------------------------------')
             print(run_result)
         return run_result
 
@@ -217,8 +216,8 @@ class Runner:
                                 gid=config.RUN_GROUP_GID,
                                 memory_limit_check_only=self._run_config.get("memory_limit_check_only", 0))
         run_result['memory'] = run_result['memory'] // 1024 // 1024
-        if config.DEBUG:
-            print('run result')
+        if config.DDLCW_DEBUG:
+            print('---------------------------------------- run result -------------------------------')
             print(run_result)
         if run_result["result"] != config.RESULT_SUCCESS:
             return run_result

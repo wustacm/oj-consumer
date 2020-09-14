@@ -1,0 +1,21 @@
+version: "3"
+services:
+  ddl-celery-dev:
+    command: celery -A tasks worker -l info -Q judge
+    volumes:
+      - .:/app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: 4ddl/ddlcw
+    container_name: ddl-celery-dev
+    restart: always
+    environment:
+      - BACKEND_HOST=192.168.50.236
+      - BACKEND_PROTOCOL=http
+      - BACKEND_PORT=8000
+      - RABBITMQ_HOST=192.168.50.10
+      - RABBITMQ_PORT=7892
+      - RABBITMQ_USER=guest
+      - RABBITMQ_PASS=guest
+      - ddlcw_env=production
