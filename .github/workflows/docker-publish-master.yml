@@ -1,0 +1,25 @@
+name: Docker Publish
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Echo Ref
+        run: | 
+          echo $GITHUB_REF
+      - name: Build Docker image
+        run: |
+          docker build . --tag 4ddl/ddlcw:latest --file Dockerfile
+      - name: Log into Docker Hub
+        run: |
+          echo "${{ secrets.DOCKER_HUB_PASS }}" | docker login -u ${{ secrets.DOCKER_HUB_USER }} --password-stdin
+      - name: Push Image to Docker Hub
+        run: |
+          docker push 4ddl/ddlcw:latest
