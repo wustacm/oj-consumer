@@ -2,3 +2,4 @@ psutil
 celery
 pyyaml
 requests
+flake8

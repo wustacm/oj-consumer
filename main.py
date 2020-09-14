@@ -1,7 +1,4 @@
 from ddlcw import Runner
-import json
-import os
-from ddlcw.config import DEBUG
 from ddlcw.utils import load_spj_config, load_submission_config
 
 

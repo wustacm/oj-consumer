@@ -1,13 +1,12 @@
 import json
 import os
+import shutil
 import subprocess
 import uuid
 
 from ddlcw import config
-
 from ddlcw import runner
-from ddlcw.exceptions import CompileError, JudgeError
-import shutil
+from ddlcw.exceptions import CompileError
 
 
 class Runner:
@@ -108,8 +107,7 @@ class Runner:
             src_path=self._src_path, exe_dir=self._runner_path, exe_path=self._exe_path)
         _command = command.split(" ")
         os.chdir(self._runner_path)
-        env = ["PATH=" + os.environ.get("PATH", "")] + \
-              self._compile_config.get("env", [])
+        env = ["PATH=" + os.environ.get("PATH", "")] + self._compile_config.get("env", [])
         result = runner.run(max_cpu_time=compile_config["max_cpu_time"],
                             max_real_time=compile_config["max_real_time"],
                             max_memory=compile_config["max_memory"],
@@ -194,8 +192,7 @@ class Runner:
 
         command = self._run_config["command"].format(exe_path=self._exe_path, exe_dir=self._runner_path,
                                                      max_memory=int(self._memory_limit * 1024)).split(" ")
-        env = ["PATH=" + os.environ.get("PATH", "")] + \
-              self._run_config.get("env", [])
+        env = ["PATH=" + os.environ.get("PATH", "")] + self._run_config.get("env", [])
         seccomp_rule = self._run_config.get("seccomp_rule")
 
         run_result = runner.run(max_cpu_time=self._time_limit * 3,
