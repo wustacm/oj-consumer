@@ -1,1 +1,3 @@
 psutil
+celery
+pyyaml

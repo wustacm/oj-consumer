@@ -1,0 +1,16 @@
+compile:
+  src_name: "main.kt"
+  exe_name: "main.jar"
+  max_cpu_time: 6000
+  max_real_time: 10000
+  max_memory: -1
+  compile_command: "/usr/local/sdkman/candidates/kotlin/current/bin/kotlinc {src_path} -include-runtime -d {exe_path}"
+  env:
+    - LANG=en_US.UTF-8
+    - JAVA_HOME=/usr/local/sdkman/candidates/java/current
+run:
+  command: "/usr/local/sdkman/candidates/java/current/bin/java -cp {exe_dir} -XX:MaxRAM={max_memory}k -Djava.security.manager -Dfile.encoding=UTF-8 -Djava.security.policy=/etc/java_policy -Djava.awt.headless=true -jar {exe_path}"
+  env:
+    - LANG=en_US.UTF-8
+    - LC_ALL=en_US.UTF-8
+  memory_limit_check_only: 1

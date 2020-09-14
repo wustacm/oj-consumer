@@ -4,7 +4,7 @@ import subprocess
 import uuid
 
 from ddlcw import config
-from ddlcw import languages
+
 from ddlcw import runner
 from ddlcw.exceptions import CompileError, JudgeError
 import shutil
@@ -12,7 +12,7 @@ import shutil
 
 class Runner:
     # 初始化一个运行的Runner
-    def __init__(self, test_case_dir, manifest, time_limit, memory_limit, code, language_config):
+    def __init__(self, test_case_dir, manifest, time_limit, memory_limit, code, language_config, spj_config):
         self._original_dir = os.path.abspath('.')
         self._manifest = manifest
         self._test_cases_dir = os.path.abspath(
@@ -21,6 +21,7 @@ class Runner:
         self._time_limit = time_limit
         # int, unit is MB
         self._memory_limit = memory_limit
+        print(language_config)
         self._compile_config = language_config['compile']
         self._language_config = language_config
         self._runner_path = os.path.join(config.RUNNER_DIR, str(uuid.uuid4()))
@@ -41,24 +42,27 @@ class Runner:
         self._compiler_out = '/dev/stderr'
         self._compiler_log = '/dev/stdout'
         self._spj = False
+        self._spj_lang = 'c'
         self._spj_code = ''
         self._spj_src_path = ''
         self._spj_exe_path = ''
+        self._spj_config = spj_config
         self._run_config = language_config['run']
         self._run_log = os.path.join(self._runner_path, "run.log")
         if self._manifest['spj'] is True:
             self._spj = True
             self._spj_code = self._manifest['spj_code']
             self._spj_src_path = os.path.join(self._runner_path,
-                                              languages.c_lang_spj_compile['src_name'])
+                                              self._spj_config['compile']['src_name'])
             self._spj_exe_path = os.path.join(self._runner_path,
-                                              languages.c_lang_spj_compile['exe_name'])
+                                              self._spj_config['compile']['exe_name'])
             with open(self._spj_src_path, 'w') as f:
                 f.write(self._spj_code)
+
     # 编译SPJ代码
 
     def _compile_spj(self):
-        compile_config = languages.c_lang_spj_compile
+        compile_config = self._spj_config['compile']
         command = compile_config['compile_command']
         command = command.format(
             src_path=self._spj_src_path, exe_path=self._spj_exe_path)
@@ -93,6 +97,7 @@ class Runner:
                         raise CompileError('Compile spj error.\n' + error)
             raise CompileError("Compile spj runtime error, info:\n%s" %
                                json.dumps(spj_compile_result))
+
     # 编译用户代码
 
     def compile(self):
@@ -105,7 +110,7 @@ class Runner:
         _command = command.split(" ")
         os.chdir(self._runner_path)
         env = ["PATH=" + os.environ.get("PATH", "")] + \
-            self._compile_config.get("env", [])
+              self._compile_config.get("env", [])
         result = runner.run(max_cpu_time=compile_config["max_cpu_time"],
                             max_real_time=compile_config["max_real_time"],
                             max_memory=compile_config["max_memory"],
@@ -135,6 +140,7 @@ class Runner:
                 "Compiler runtime error, info: \n%s\n" % json.dumps(result))
         else:
             return self._exe_path
+
     # 运行单个测试样例的SPJ代码
 
     def _judge_single_spj(self, input_path, output_path, test_case):
@@ -142,11 +148,11 @@ class Runner:
         spj_in_file_path = os.path.join(self._runner_path, test_case['in'])
         shutil.copyfile(input_path, spj_in_file_path)
         os.chown(spj_in_file_path, config.RUN_USER_UID, config.RUN_GROUP_GID)
-        command = languages.c_lang_spj_config['command'].format(exe_path=self._spj_exe_path,
-                                                                in_file_path=spj_in_file_path,
-                                                                user_out_file_path=output_path).split(" ")
+        command = self._spj_config['run']['command'].format(exe_path=self._spj_exe_path,
+                                                            in_file_path=spj_in_file_path,
+                                                            user_out_file_path=output_path).split(" ")
         env = ["PATH=" + os.environ.get("PATH", "")]
-        seccomp_rule = languages.c_lang_spj_config["seccomp_rule"]
+        seccomp_rule = self._spj_config['run']["seccomp_rule"]
         in_file_path = os.path.join(self._test_cases_dir, test_case['in'])
         os.chown(output_path, config.RUN_USER_UID, config.RUN_GROUP_GID)
         # run test case output path & run test case error path
@@ -175,6 +181,7 @@ class Runner:
             print('run spj result')
             print(run_result)
         return run_result
+
     # 运行单个测试样例
 
     def _judge_single(self, test_case):
@@ -189,8 +196,8 @@ class Runner:
         command = self._run_config["command"].format(exe_path=self._exe_path, exe_dir=self._runner_path,
                                                      max_memory=int(self._memory_limit * 1024)).split(" ")
         env = ["PATH=" + os.environ.get("PATH", "")] + \
-            self._run_config.get("env", [])
-        seccomp_rule = self._run_config["seccomp_rule"]
+              self._run_config.get("env", [])
+        seccomp_rule = self._run_config.get("seccomp_rule")
 
         run_result = runner.run(max_cpu_time=self._time_limit * 3,
                                 max_real_time=self._time_limit * 9,
@@ -254,6 +261,7 @@ class Runner:
         if not out:
             return config.RESULT_PRESENTATION_ERROR
         return config.RESULT_WRONG_ANSWER
+
     # 运行所有数据
 
     def run(self):
