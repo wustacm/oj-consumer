@@ -4,7 +4,7 @@ compile:
   max_cpu_time: 3000
   max_real_time: 5000
   # 128MB
-  max_memory: 134217728
+  max_memory: 1073741824
   compile_command: "/usr/bin/gcc -DONLINE_JUDGE -O2 -w -fmax-errors=3 -std=c11 {src_path} -lm -o {exe_path}"
 
 run:

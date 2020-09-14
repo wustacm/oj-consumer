@@ -15,7 +15,7 @@ services:
       - BACKEND_PROTOCOL=http
       - BACKEND_PORT=8000
       - RABBITMQ_HOST=192.168.50.10
-      - RABBITMQ_PORT=7892
+      - RABBITMQ_PORT=5672
       - RABBITMQ_USER=guest
       - RABBITMQ_PASS=guest
-      - ddlcw_env=production
+      - DDLCW_ENV=development

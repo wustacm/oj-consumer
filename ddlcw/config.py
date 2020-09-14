@@ -3,7 +3,7 @@ import os
 import pwd
 import traceback
 
-if os.getenv('ddlcw_env', 'production') == 'development':
+if os.getenv('DDLCW_ENV', 'production') == 'development':
     DDLCW_DEBUG = True
 else:
     DDLCW_DEBUG = False
