@@ -16,7 +16,7 @@ jobs:
           echo $GITHUB_REF
       - name: Build Docker image
         run: |
-          docker build . --tag 4ddl/ddlcw:latest --file Dockerfile
+          docker build . --tag 4ddl/ddlcw:latest --file Dockerfile-CI
       - name: Log into Docker Hub
         run: |
           echo "${{ secrets.DOCKER_HUB_PASS }}" | docker login -u ${{ secrets.DOCKER_HUB_USER }} --password-stdin

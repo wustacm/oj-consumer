@@ -3,10 +3,12 @@ import os
 import pwd
 import traceback
 
-if os.getenv('DDLCW_ENV', 'production') == 'development':
+if os.getenv('DDLCW_DEBUG', 'False') == 'True':
     DDLCW_DEBUG = True
 else:
     DDLCW_DEBUG = False
+
+DDLCW_ENV = os.getenv('DDLCW_ENV', 'development')
 UNLIMITED = -1
 
 ACCEPT_SUBMISSION_LANGUAGES = ['c', 'cpp', 'java', 'go', 'python', 'kotlin']
@@ -59,7 +61,7 @@ class Verdict:
     }
 
 
-if DDLCW_DEBUG:
+if DDLCW_ENV != 'production':
     BASE_DIR = os.path.abspath('./judge')
     TMP_DIR = os.path.join(BASE_DIR, 'tmp')
 else:
