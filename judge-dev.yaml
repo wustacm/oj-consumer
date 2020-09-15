@@ -18,3 +18,4 @@ services:
       - RABBITMQ_PASS=guest
       - DDLCW_ENV=development
       - DDLCW_DEBUG=True
+      - DDLCW_SYNC_ENABLE=False

@@ -6,6 +6,7 @@ ENV TZ=Asia/Shanghai
 ENV SDKMAN_DIR="/usr/local/sdkman"
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 ENV DDLCW_ENV production
+ENV DDLCW_SYNC_ENABLE False
 ADD . /app
 WORKDIR /app
 RUN sed -i 's/archive.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list

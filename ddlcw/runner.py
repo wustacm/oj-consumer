@@ -1,7 +1,8 @@
 import json
 import subprocess
 
-from ddlcw.config import UNLIMITED, DDLCW_DEBUG
+from ddlcw.config import UNLIMITED
+from ddlcw.env import DDLCW_DEBUG
 
 
 def run(max_cpu_time,

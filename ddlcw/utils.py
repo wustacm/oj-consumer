@@ -1,13 +1,15 @@
 import json
 import os
-from json import JSONDecodeError
-
-import yaml
-from yaml import YAMLError
-import requests
-from ddlcw.config import PROBLEM_TEST_CASES_DIR, BACKEND_SYNC_TEST_CASES_URL, JUDGE_TOKEN, TMP_DIR
 import traceback
 import zipfile
+from json import JSONDecodeError
+
+import requests
+import yaml
+from yaml import YAMLError
+
+from ddlcw.config import PROBLEM_TEST_CASES_DIR, BACKEND_SYNC_TEST_CASES_URL, TMP_DIR
+from ddlcw.env import JUDGE_TOKEN
 
 
 class ManifestError(Exception):

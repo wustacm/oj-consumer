@@ -4,8 +4,9 @@ import shutil
 import subprocess
 import uuid
 
-from ddlcw import config
 from ddlcw import runner
+from ddlcw.config import Result, RUN_USER_UID, RUN_GROUP_GID, RUNNER_DIR, UNLIMITED
+from ddlcw.env import DDLCW_DEBUG
 from ddlcw.exceptions import CompileError
 
 
@@ -22,10 +23,10 @@ class Runner:
         self._memory_limit = memory_limit
         self._compile_config = language_config['compile']
         self._language_config = language_config
-        self._runner_path = os.path.join(config.RUNNER_DIR, str(uuid.uuid4()))
+        self._runner_path = os.path.join(RUNNER_DIR, str(uuid.uuid4()))
         if not os.path.exists(self._runner_path):
             os.makedirs(self._runner_path)
-        os.chown(self._runner_path, config.RUN_USER_UID, config.RUN_GROUP_GID)
+        os.chown(self._runner_path, RUN_USER_UID, RUN_GROUP_GID)
         self._src_path = os.path.join(
             self._runner_path, self._compile_config['src_name'])
         with open(self._src_path, 'w') as f:
@@ -35,8 +36,8 @@ class Runner:
             self._runner_path, self._compile_config["exe_name"])
         if not os.path.exists(self._runner_path):
             os.makedirs(self._runner_path)
-            os.chown(self._runner_path, config.RUN_USER_UID,
-                     config.RUN_GROUP_GID)
+            os.chown(self._runner_path, RUN_USER_UID,
+                     RUN_GROUP_GID)
         self._compiler_out = '/dev/stderr'
         self._compiler_log = '/dev/stdout'
         self._spj = False
@@ -66,28 +67,28 @@ class Runner:
             src_path=self._spj_src_path, exe_path=self._spj_exe_path)
         _command = command.split(' ')
         os.chdir(self._runner_path)
-        env = compile_config.get("env", [])
-        env.append("PATH=" + os.getenv("PATH"))
+        runner_env = compile_config.get("env", [])
+        runner_env.append("PATH=" + os.getenv("PATH"))
         spj_compile_result = runner.run(max_cpu_time=compile_config['max_cpu_time'],
                                         max_real_time=compile_config['max_real_time'],
                                         max_memory=compile_config['max_memory'],
                                         max_stack=128 * 1024 * 1024,
                                         max_output_size=20 * 1024 * 1024,
-                                        max_process_number=config.UNLIMITED,
+                                        max_process_number=UNLIMITED,
                                         exe_path=_command[0],
                                         input_path=self._spj_src_path,
                                         output_path=self._compiler_out,
                                         error_path=self._compiler_out,
                                         args=_command[1::],
-                                        env=env,
+                                        env=runner_env,
                                         log_path=self._compiler_log,
                                         seccomp_rule_name=None,
-                                        uid=config.RUN_USER_UID,
-                                        gid=config.RUN_GROUP_GID)
-        if config.DDLCW_DEBUG:
+                                        uid=RUN_USER_UID,
+                                        gid=RUN_GROUP_GID)
+        if DDLCW_DEBUG:
             print('--------------- spj compile result ---------------')
             print(spj_compile_result)
-        if spj_compile_result["result"] != config.RESULT_SUCCESS:
+        if spj_compile_result["result"] != Result.RESULT_SUCCESS:
             if os.path.exists(self._compiler_out):
                 with open(self._compiler_out, encoding="utf-8") as f:
                     error = f.read().strip()
@@ -107,27 +108,27 @@ class Runner:
             src_path=self._src_path, exe_dir=self._runner_path, exe_path=self._exe_path)
         _command = command.split(" ")
         os.chdir(self._runner_path)
-        env = ["PATH=" + os.environ.get("PATH", "")] + self._compile_config.get("env", [])
+        runner_env = ["PATH=" + os.environ.get("PATH", "")] + self._compile_config.get("env", [])
         result = runner.run(max_cpu_time=compile_config["max_cpu_time"],
                             max_real_time=compile_config["max_real_time"],
                             max_memory=compile_config["max_memory"],
                             max_stack=128 * 1024 * 1024,
                             max_output_size=20 * 1024 * 1024,
-                            max_process_number=config.UNLIMITED,
+                            max_process_number=UNLIMITED,
                             exe_path=_command[0],
                             input_path=self._src_path,
                             output_path=self._compiler_out,
                             error_path=self._compiler_out,
                             args=_command[1::],
-                            env=env,
+                            env=runner_env,
                             log_path=self._compiler_log,
                             seccomp_rule_name=None,
-                            uid=config.RUN_USER_UID,
-                            gid=config.RUN_GROUP_GID)
-        if config.DDLCW_DEBUG:
+                            uid=RUN_USER_UID,
+                            gid=RUN_GROUP_GID)
+        if DDLCW_DEBUG:
             print('--------------- compile result ---------------')
             print(result)
-        if result["result"] != config.RESULT_SUCCESS:
+        if result["result"] != Result.RESULT_SUCCESS:
             if os.path.exists(self._compiler_out):
                 with open(self._compiler_out, encoding="utf-8") as f:
                     error = f.read().strip()
@@ -144,14 +145,14 @@ class Runner:
         # 将输入数据拷贝到运行目录下面，并且分配权限
         spj_in_file_path = os.path.join(self._runner_path, test_case['in'])
         shutil.copyfile(input_path, spj_in_file_path)
-        os.chown(spj_in_file_path, config.RUN_USER_UID, config.RUN_GROUP_GID)
+        os.chown(spj_in_file_path, RUN_USER_UID, RUN_GROUP_GID)
         command = self._spj_config['run']['command'].format(exe_path=self._spj_exe_path,
                                                             in_file_path=spj_in_file_path,
                                                             user_out_file_path=output_path).split(" ")
-        env = ["PATH=" + os.environ.get("PATH", "")]
+        runner_env = ["PATH=" + os.environ.get("PATH", "")]
         seccomp_rule = self._spj_config['run']["seccomp_rule"]
         in_file_path = os.path.join(self._test_cases_dir, test_case['in'])
-        os.chown(output_path, config.RUN_USER_UID, config.RUN_GROUP_GID)
+        os.chown(output_path, RUN_USER_UID, RUN_GROUP_GID)
         # run test case output path & run test case error path
         run_out_file_path = os.path.join(
             self._runner_path, test_case['out'] + '.spj')
@@ -162,19 +163,19 @@ class Runner:
                                 max_memory=self._memory_limit * 1024 * 1024,
                                 max_stack=128 * 1024 * 1024,
                                 max_output_size=1024 * 1024 * 16,
-                                max_process_number=config.UNLIMITED,
+                                max_process_number=UNLIMITED,
                                 exe_path=command[0],
                                 args=command[1::],
-                                env=env,
+                                env=runner_env,
                                 input_path=in_file_path,
                                 output_path=run_out_file_path,
                                 error_path=run_out_err_path,
                                 log_path=self._run_log,
                                 seccomp_rule_name=seccomp_rule,
-                                uid=config.RUN_USER_UID,
-                                gid=config.RUN_GROUP_GID,
+                                uid=RUN_USER_UID,
+                                gid=RUN_GROUP_GID,
                                 memory_limit_check_only=self._run_config.get("memory_limit_check_only", 0))
-        if config.DDLCW_DEBUG:
+        if DDLCW_DEBUG:
             print('--------------- run spj result ---------------')
             print(run_result)
         return run_result
@@ -192,7 +193,7 @@ class Runner:
 
         command = self._run_config["command"].format(exe_path=self._exe_path, exe_dir=self._runner_path,
                                                      max_memory=int(self._memory_limit * 1024)).split(" ")
-        env = ["PATH=" + os.environ.get("PATH", "")] + self._run_config.get("env", [])
+        runner_env = ["PATH=" + os.environ.get("PATH", "")] + self._run_config.get("env", [])
         seccomp_rule = self._run_config.get("seccomp_rule")
 
         run_result = runner.run(max_cpu_time=self._time_limit * 3,
@@ -200,23 +201,23 @@ class Runner:
                                 max_memory=self._memory_limit * 1024 * 1024,
                                 max_stack=128 * 1024 * 1024,
                                 max_output_size=1024 * 1024 * 16,
-                                max_process_number=config.UNLIMITED,
+                                max_process_number=UNLIMITED,
                                 exe_path=command[0],
                                 args=command[1::],
-                                env=env,
+                                env=runner_env,
                                 input_path=in_file_path,
                                 output_path=run_out_file_path,
                                 error_path=run_out_err_path,
                                 log_path=self._run_log,
                                 seccomp_rule_name=seccomp_rule,
-                                uid=config.RUN_USER_UID,
-                                gid=config.RUN_GROUP_GID,
+                                uid=RUN_USER_UID,
+                                gid=RUN_GROUP_GID,
                                 memory_limit_check_only=self._run_config.get("memory_limit_check_only", 0))
         run_result['memory'] = run_result['memory'] // 1024 // 1024
-        if config.DDLCW_DEBUG:
+        if DDLCW_DEBUG:
             print('--------------- run result ---------------')
             print(run_result)
-        if run_result["result"] != config.RESULT_SUCCESS:
+        if run_result["result"] != Result.RESULT_SUCCESS:
             return run_result
         if self._spj:
             spj_run_result = self._judge_single_spj(
@@ -224,12 +225,12 @@ class Runner:
             if spj_run_result['exit_code'] == 0:
                 run_result['result'] = spj_run_result['result']
             elif spj_run_result['exit_code'] == 1:
-                run_result['result'] = config.RESULT_WRONG_ANSWER
+                run_result['result'] = Result.RESULT_WRONG_ANSWER
             else:
-                run_result['result'] = config.RESULT_SYSTEM_ERROR
+                run_result['result'] = Result.RESULT_SYSTEM_ERROR
         else:
             if not os.path.exists(run_out_file_path):
-                run_result["result"] = config.RESULT_WRONG_ANSWER
+                run_result["result"] = Result.RESULT_WRONG_ANSWER
             else:
                 run_result["result"] = Runner.diff(
                     standard_path=out_file_path, output_path=run_out_file_path)
@@ -246,17 +247,17 @@ class Runner:
             args1, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         out, err = proc.communicate()
         if err:
-            return config.RESULT_SYSTEM_ERROR
+            return Result.RESULT_SYSTEM_ERROR
         if not out:
-            return config.RESULT_SUCCESS
+            return Result.RESULT_SUCCESS
         proc = subprocess.Popen(
             args2, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         out, err = proc.communicate()
         if err:
-            return config.RESULT_SYSTEM_ERROR
+            return Result.RESULT_SYSTEM_ERROR
         if not out:
-            return config.RESULT_PRESENTATION_ERROR
-        return config.RESULT_WRONG_ANSWER
+            return Result.RESULT_PRESENTATION_ERROR
+        return Result.RESULT_WRONG_ANSWER
 
     # 运行所有数据
 
