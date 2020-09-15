@@ -9,7 +9,7 @@ services:
     container_name: ddl-judge-dev
     restart: always
     environment:
-      - BACKEND_HOST=192.168.50.132
+      - BACKEND_HOST=127.0.0.1
       - BACKEND_PROTOCOL=http
       - BACKEND_PORT=8000
       - RABBITMQ_HOST=192.168.50.10
