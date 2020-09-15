@@ -3,7 +3,8 @@ import traceback
 from celery import Celery
 
 from ddlcw import Runner as JudgeRunner
-from ddlcw.config import Verdict, ACCEPT_SUBMISSION_LANGUAGES, PROBLEM_TEST_CASES_DIR, BROKER_URL, DDLCW_DEBUG
+from ddlcw.config import Verdict, PROBLEM_TEST_CASES_DIR, BROKER_URL, DDLCW_DEBUG
+from ddlcw.languages import ACCEPT_SUBMISSION_LANGUAGES
 from ddlcw.utils import load_spj_config, load_submission_config, validate_manifest, ManifestError, TestCaseError, \
     sync_test_cases
 

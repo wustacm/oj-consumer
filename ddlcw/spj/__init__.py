@@ -1,0 +1,1 @@
+ACCEPT_SPJ_LANGUAGES = ['c']

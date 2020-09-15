@@ -9,10 +9,8 @@ else:
     DDLCW_DEBUG = False
 
 DDLCW_ENV = os.getenv('DDLCW_ENV', 'development')
-UNLIMITED = -1
 
-ACCEPT_SUBMISSION_LANGUAGES = ['c', 'cpp', 'java', 'go', 'python', 'kotlin']
-ACCEPT_SPJ_LANGUAGES = ['c']
+UNLIMITED = -1
 
 RESULT_SUCCESS = 0
 RESULT_WRONG_ANSWER = -1
