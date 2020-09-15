@@ -19,6 +19,6 @@ RABBITMQ_PASS = os.getenv('RABBITMQ_PASS', 'guest')
 # BACKEND protocol
 BACKEND_PROTOCOL = os.getenv('BACKEND_PROTOCOL', 'http')
 # BACKEND host
-BACKEND_HOST = os.getenv('BACKEND_PROTOCOL', '127.0.0.1')
+BACKEND_HOST = os.getenv('BACKEND_HOST', '127.0.0.1')
 # BACKEND port
-BACKEND_PORT = os.getenv('BACKEND_PROTOCOL', 8000)
+BACKEND_PORT = os.getenv('BACKEND_PORT', 8000)
