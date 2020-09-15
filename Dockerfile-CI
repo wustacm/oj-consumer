@@ -5,7 +5,7 @@ LABEL maintainer="xudian.cn@gmail.com"
 ENV TZ=UTC
 ENV SDKMAN_DIR="/usr/local/sdkman"
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-ENV DDLCW_ENV production
+ENV DDLCW_ENV container
 ENV DDLCW_SYNC_ENABLE False
 ADD . /app
 WORKDIR /app

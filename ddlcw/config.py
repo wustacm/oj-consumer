@@ -58,7 +58,7 @@ class Verdict:
     }
 
 
-if DDLCW_ENV != 'production':
+if DDLCW_ENV != 'container':
     BASE_DIR = os.path.abspath('./judge')
     TMP_DIR = os.path.join(BASE_DIR, 'tmp')
 else:

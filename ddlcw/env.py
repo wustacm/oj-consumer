@@ -5,7 +5,7 @@ DDLCW_DEBUG = os.getenv('DDLCW_DEBUG', 'False') == 'True'
 # enable test cases sync
 DDLCW_ENABLE_SYNC = os.getenv('DDLCW_SYNC_ENABLE', 'False') == 'True'
 # is development or production
-DDLCW_ENV = os.getenv('DDLCW_ENV', 'development')
+DDLCW_ENV = os.getenv('DDLCW_ENV', 'host')
 # request test cases token
 JUDGE_TOKEN = os.getenv('JUDGE_TOKEN', 'JUDGE_TOKEN')
 # RabbitMQ host
