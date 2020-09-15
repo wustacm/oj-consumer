@@ -1,8 +1,8 @@
 compile:
   src_name: "main.kt"
   exe_name: "main.jar"
-  max_cpu_time: 6000
-  max_real_time: 10000
+  max_cpu_time: 15000
+  max_real_time: 15000
   max_memory: -1
   compile_command: "/usr/local/sdkman/candidates/kotlin/current/bin/kotlinc {src_path} -include-runtime -d {exe_path}"
   env:
