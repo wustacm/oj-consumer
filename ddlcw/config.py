@@ -8,6 +8,11 @@ if os.getenv('DDLCW_DEBUG', 'False') == 'True':
 else:
     DDLCW_DEBUG = False
 
+if os.getenv('DDLCW_SYNC_ENABLE', 'False') == 'True':
+    DDLCW_ENABLE_SYNC = True
+else:
+    DDLCW_ENABLE_SYNC = False
+
 DDLCW_ENV = os.getenv('DDLCW_ENV', 'development')
 
 UNLIMITED = -1

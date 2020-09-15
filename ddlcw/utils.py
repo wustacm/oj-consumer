@@ -104,13 +104,19 @@ def sync_test_cases(valid_hash, problem_id):
     os.makedirs(TMP_DIR, exist_ok=True)
     tmp_file_name = f'{valid_hash}.zip'
     tmp_file_path = os.path.join(TMP_DIR, tmp_file_name)
+    # request test cases zip file
     problem_test_cases_url = BACKEND_SYNC_TEST_CASES_URL.format(problem_id=problem_id)
-    res = requests.get(problem_test_cases_url, headers={'JudgeToken': JUDGE_TOKEN})
+    res = requests.get(
+        problem_test_cases_url,
+        headers={'JudgeToken': JUDGE_TOKEN},
+        timeout=(4, 20)
+    )
     if res.status_code != 200:
         return
     with open(tmp_file_path, 'wb') as fd:
         for chunk in res.iter_content(chunk_size=128):
             fd.write(chunk)
+    # unzip test cases zip file
     test_cases_dir = os.path.join(PROBLEM_TEST_CASES_DIR, valid_hash)
     os.makedirs(test_cases_dir, exist_ok=True)
     tmp_zip_file = zipfile.ZipFile(tmp_file_path, 'r')

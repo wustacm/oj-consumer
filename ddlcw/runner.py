@@ -57,7 +57,7 @@ def run(max_cpu_time,
     if seccomp_rule_name:
         proc_args.append("--seccomp_rule={}".format(seccomp_rule_name))
     if DDLCW_DEBUG:
-        print('---------------------------------------- ddlc command -------------------------------')
+        print('--------------- ddlc command ---------------')
         print(' '.join(proc_args))
     proc = subprocess.Popen(
         proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -66,6 +66,6 @@ def run(max_cpu_time,
     if err:
         raise ValueError("Error occurred while calling ddlc: {}".format(err))
     if DDLCW_DEBUG:
-        print('---------------------------------------- ddlc run out -------------------------------')
+        print('--------------- ddlc run out ---------------')
         print(out)
     return json.loads(out.decode("utf-8"))

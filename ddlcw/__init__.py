@@ -85,7 +85,7 @@ class Runner:
                                         uid=config.RUN_USER_UID,
                                         gid=config.RUN_GROUP_GID)
         if config.DDLCW_DEBUG:
-            print('---------------------------------------- spj compile result -------------------------------')
+            print('--------------- spj compile result ---------------')
             print(spj_compile_result)
         if spj_compile_result["result"] != config.RESULT_SUCCESS:
             if os.path.exists(self._compiler_out):
@@ -125,7 +125,7 @@ class Runner:
                             uid=config.RUN_USER_UID,
                             gid=config.RUN_GROUP_GID)
         if config.DDLCW_DEBUG:
-            print('---------------------------------------- compile result -------------------------------')
+            print('--------------- compile result ---------------')
             print(result)
         if result["result"] != config.RESULT_SUCCESS:
             if os.path.exists(self._compiler_out):
@@ -175,7 +175,7 @@ class Runner:
                                 gid=config.RUN_GROUP_GID,
                                 memory_limit_check_only=self._run_config.get("memory_limit_check_only", 0))
         if config.DDLCW_DEBUG:
-            print('---------------------------------------- run spj result -------------------------------')
+            print('--------------- run spj result ---------------')
             print(run_result)
         return run_result
 
@@ -214,7 +214,7 @@ class Runner:
                                 memory_limit_check_only=self._run_config.get("memory_limit_check_only", 0))
         run_result['memory'] = run_result['memory'] // 1024 // 1024
         if config.DDLCW_DEBUG:
-            print('---------------------------------------- run result -------------------------------')
+            print('--------------- run result ---------------')
             print(run_result)
         if run_result["result"] != config.RESULT_SUCCESS:
             return run_result
