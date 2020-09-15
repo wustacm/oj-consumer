@@ -1,15 +1,15 @@
 version: "3"
 services:
-  ddl-celery-dev:
+  ddl-judge-dev:
     command: celery -A tasks worker -l info -Q judge
     volumes:
       - .:/app
       - ~/data/judge-dev/test_cases:/judge/test_cases
     image: 4ddl/ddlcw
-    container_name: ddl-celery-dev
+    container_name: ddl-judge-dev
     restart: always
     environment:
-      - BACKEND_HOST=192.168.50.236
+      - BACKEND_HOST=192.168.50.132
       - BACKEND_PROTOCOL=http
       - BACKEND_PORT=8000
       - RABBITMQ_HOST=192.168.50.10
