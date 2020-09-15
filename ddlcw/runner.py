@@ -64,9 +64,9 @@ def run(max_cpu_time,
         proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     out, err = proc.communicate()
-    if err:
-        raise ValueError("Error occurred while calling ddlc: {}".format(err))
     if DDLCW_DEBUG:
         print('--------------- ddlc run out ---------------')
         print(out)
+    if err:
+        raise ValueError("Error occurred while calling ddlc: {}".format(err))
     return json.loads(out.decode("utf-8"))

@@ -69,6 +69,7 @@ class Runner:
         os.chdir(self._runner_path)
         runner_env = compile_config.get("env", [])
         runner_env.append("PATH=" + os.getenv("PATH"))
+        runner_env.append("JAVA_OPTS=" + os.getenv("JAVA_OPTS"))
         spj_compile_result = runner.run(max_cpu_time=compile_config['max_cpu_time'],
                                         max_real_time=compile_config['max_real_time'],
                                         max_memory=compile_config['max_memory'],
@@ -109,6 +110,7 @@ class Runner:
         _command = command.split(" ")
         os.chdir(self._runner_path)
         runner_env = ["PATH=" + os.environ.get("PATH", "")] + self._compile_config.get("env", [])
+        runner_env.append("JAVA_OPTS=" + os.getenv("JAVA_OPTS"))
         result = runner.run(max_cpu_time=compile_config["max_cpu_time"],
                             max_real_time=compile_config["max_real_time"],
                             max_memory=compile_config["max_memory"],
@@ -149,7 +151,7 @@ class Runner:
         command = self._spj_config['run']['command'].format(exe_path=self._spj_exe_path,
                                                             in_file_path=spj_in_file_path,
                                                             user_out_file_path=output_path).split(" ")
-        runner_env = ["PATH=" + os.environ.get("PATH", "")]
+        runner_env = ["PATH=" + os.environ.get("PATH", ""), "JAVA_OPTS=" + os.getenv("JAVA_OPTS")]
         seccomp_rule = self._spj_config['run']["seccomp_rule"]
         in_file_path = os.path.join(self._test_cases_dir, test_case['in'])
         os.chown(output_path, RUN_USER_UID, RUN_GROUP_GID)
