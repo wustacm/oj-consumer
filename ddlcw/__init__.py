@@ -5,8 +5,7 @@ import subprocess
 import uuid
 
 from ddlcw import runner
-from ddlcw.config import Result, RUN_USER_UID, RUN_GROUP_GID, RUNNER_DIR, UNLIMITED
-from ddlcw.env import DDLCW_DEBUG
+from ddlcw.config import Result, RUN_USER_UID, RUN_GROUP_GID, RUNNER_DIR, UNLIMITED, logger
 from ddlcw.exceptions import CompileError
 
 
@@ -86,9 +85,7 @@ class Runner:
                                         seccomp_rule_name=None,
                                         uid=RUN_USER_UID,
                                         gid=RUN_GROUP_GID)
-        if DDLCW_DEBUG:
-            print('--------------- spj compile result ---------------')
-            print(spj_compile_result)
+        logger.debug(spj_compile_result)
         if spj_compile_result["result"] != Result.RESULT_SUCCESS:
             if os.path.exists(self._compiler_out):
                 with open(self._compiler_out, encoding="utf-8") as f:
@@ -127,9 +124,7 @@ class Runner:
                             seccomp_rule_name=None,
                             uid=RUN_USER_UID,
                             gid=RUN_GROUP_GID)
-        if DDLCW_DEBUG:
-            print('--------------- compile result ---------------')
-            print(result)
+        logger.debug(result)
         if result["result"] != Result.RESULT_SUCCESS:
             if os.path.exists(self._compiler_out):
                 with open(self._compiler_out, encoding="utf-8") as f:
@@ -143,23 +138,26 @@ class Runner:
 
     # 运行单个测试样例的SPJ代码
 
-    def _judge_single_spj(self, input_path, output_path, test_case):
-        # 将输入数据拷贝到运行目录下面，并且分配权限
+    def _judge_single_spj(self, input_path, output_path, user_output_path, test_case):
+        # 将test case拷贝到运行目录下面，并且分配权限
         spj_in_file_path = os.path.join(self._runner_path, test_case['in'])
+        spj_out_file_path = os.path.join(self._runner_path, test_case['out'])
         shutil.copyfile(input_path, spj_in_file_path)
+        shutil.copyfile(output_path, spj_out_file_path)
         os.chown(spj_in_file_path, RUN_USER_UID, RUN_GROUP_GID)
+        os.chown(spj_out_file_path, RUN_USER_UID, RUN_GROUP_GID)
+
         command = self._spj_config['run']['command'].format(exe_path=self._spj_exe_path,
                                                             in_file_path=spj_in_file_path,
-                                                            user_out_file_path=output_path).split(" ")
+                                                            out_file_path=spj_out_file_path,
+                                                            user_out_file_path=user_output_path).split(" ")
         runner_env = ["PATH=" + os.environ.get("PATH", ""), "JAVA_OPTS=" + os.getenv("JAVA_OPTS")]
+
         seccomp_rule = self._spj_config['run']["seccomp_rule"]
         in_file_path = os.path.join(self._test_cases_dir, test_case['in'])
-        os.chown(output_path, RUN_USER_UID, RUN_GROUP_GID)
         # run test case output path & run test case error path
-        run_out_file_path = os.path.join(
-            self._runner_path, test_case['out'] + '.spj')
-        run_out_err_path = os.path.join(
-            self._runner_path, test_case['in'] + '.err.spj')
+        run_out_file_path = os.path.join(self._runner_path, test_case['out'] + '.spj.out')
+        run_out_err_path = os.path.join(self._runner_path, test_case['out'] + '.spj.err')
         run_result = runner.run(max_cpu_time=self._time_limit * 3,
                                 max_real_time=self._time_limit * 9,
                                 max_memory=self._memory_limit * 1024 * 1024,
@@ -177,9 +175,7 @@ class Runner:
                                 uid=RUN_USER_UID,
                                 gid=RUN_GROUP_GID,
                                 memory_limit_check_only=self._run_config.get("memory_limit_check_only", 0))
-        if DDLCW_DEBUG:
-            print('--------------- run spj result ---------------')
-            print(run_result)
+        logger.debug(run_result)
         return run_result
 
     # 运行单个测试样例
@@ -216,14 +212,12 @@ class Runner:
                                 gid=RUN_GROUP_GID,
                                 memory_limit_check_only=self._run_config.get("memory_limit_check_only", 0))
         run_result['memory'] = run_result['memory'] // 1024 // 1024
-        if DDLCW_DEBUG:
-            print('--------------- run result ---------------')
-            print(run_result)
+        logger.debug(run_result)
         if run_result["result"] != Result.RESULT_SUCCESS:
             return run_result
         if self._spj:
             spj_run_result = self._judge_single_spj(
-                in_file_path, run_out_file_path, test_case)
+                in_file_path, out_file_path, run_out_file_path, test_case)
             if spj_run_result['exit_code'] == 0:
                 run_result['result'] = spj_run_result['result']
             elif spj_run_result['exit_code'] == 1:

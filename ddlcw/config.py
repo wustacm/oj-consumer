@@ -1,7 +1,10 @@
 import grp
+import logging.config
 import os
 import pwd
 import traceback
+
+from celery.utils.log import get_task_logger
 
 from ddlcw.env import DDLCW_ENV, RABBITMQ_HOST, RABBITMQ_PASS, RABBITMQ_PORT, \
     RABBITMQ_USER, BACKEND_HOST, BACKEND_PORT, BACKEND_PROTOCOL
@@ -83,3 +86,36 @@ RUN_GROUP_GID = grp.getgrnam("code").gr_gid
 BROKER_URL = f"amqp://{RABBITMQ_USER}:{RABBITMQ_PASS}@{RABBITMQ_HOST}:{RABBITMQ_PORT}/"
 BACKEND_BASE_URL = f"{BACKEND_PROTOCOL}://{BACKEND_HOST}:{BACKEND_PORT}"
 BACKEND_SYNC_TEST_CASES_URL = BACKEND_BASE_URL + '/api/problem/{problem_id}/sync_test_cases/'
+
+LOG_CONFIG = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {
+            # 'datefmt': '%m-%d-%Y %H:%M:%S'
+            'format': '%(asctime)s \"%(pathname)s：%(module)s:%(funcName)s:%(lineno)d\" [%(levelname)s]- %(message)s'
+        }
+    },
+    'handlers': {
+        'celery': {
+            # 'level': 'INFO',
+            # 'class': 'logging.handlers.RotatingFileHandler',
+            'level': 'DEBUG',
+            'formatter': 'simple',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'filename': 'your_name.log',
+            'when': 'midnight',
+            'encoding': 'utf-8',
+        },
+    },
+    'loggers': {
+        'myapp': {
+            'handlers': ['celery'],
+            'level': 'INFO',
+            'propagate': True,
+        }
+    }
+}
+
+logging.config.dictConfig(LOG_CONFIG)
+logger = get_task_logger('myapp')

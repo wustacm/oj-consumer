@@ -11,12 +11,12 @@ services:
     container_name: ddl-judge-dev
     restart: always
     environment:
-      - BACKEND_HOST=127.0.0.1
+      - BACKEND_HOST=ddl.wustacm.top
       - BACKEND_PROTOCOL=http
       - BACKEND_PORT=80
-      - RABBITMQ_HOST=127.0.0.1
+      - RABBITMQ_HOST=ddl.wustacm.top
       - RABBITMQ_PORT=5672
       - RABBITMQ_USER=guest
-      - RABBITMQ_PASS=guest
+      - RABBITMQ_PASS=ddl_rabbitmq_pass
       - DDLCW_DEBUG=True
-      - DDLCW_SYNC_ENABLE=False
+      - DDLCW_SYNC_ENABLE=True

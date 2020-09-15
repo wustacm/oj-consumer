@@ -1,8 +1,7 @@
 import json
 import subprocess
 
-from ddlcw.config import UNLIMITED
-from ddlcw.env import DDLCW_DEBUG
+from ddlcw.config import UNLIMITED, logger
 
 
 def run(max_cpu_time,
@@ -57,16 +56,13 @@ def run(max_cpu_time,
         raise ValueError("seccomp_rule_name must be a string or None")
     if seccomp_rule_name:
         proc_args.append("--seccomp_rule={}".format(seccomp_rule_name))
-    if DDLCW_DEBUG:
-        print('--------------- ddlc command ---------------')
-        print(' '.join(proc_args))
+    logger.debug(' ||| '.join(proc_args))
     proc = subprocess.Popen(
         proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     out, err = proc.communicate()
-    if DDLCW_DEBUG:
-        print('--------------- ddlc run out ---------------')
-        print(out)
+    logger.debug(out)
     if err:
+        logger.error(err)
         raise ValueError("Error occurred while calling ddlc: {}".format(err))
     return json.loads(out.decode("utf-8"))

@@ -3,8 +3,9 @@ import traceback
 from celery import Celery
 
 from ddlcw import Runner as JudgeRunner
-from ddlcw.env import DDLCW_DEBUG, DDLCW_ENABLE_SYNC
 from ddlcw.config import Verdict, PROBLEM_TEST_CASES_DIR, BROKER_URL
+from ddlcw.config import logger
+from ddlcw.env import DDLCW_ENABLE_SYNC
 from ddlcw.languages import ACCEPT_SUBMISSION_LANGUAGES
 from ddlcw.utils import load_spj_config, load_submission_config, validate_manifest, ManifestError, TestCaseError, \
     sync_test_cases
@@ -24,8 +25,10 @@ def result_submission_task(submission_id, verdict, time_spend, memory_spend, add
 
 @app.task(name='run_submission_task')
 def run_submission_task(submission_id, problem_id, manifest, code, language, time_limit, memory_limit):
+    logger.debug(submission_id, problem_id, manifest, code, language, time_limit, memory_limit)
     result_submission_task.apply_async(args=[submission_id, Verdict.RUNNING, None, None, {}], queue='result')
     if language not in ACCEPT_SUBMISSION_LANGUAGES:
+        logger.warning('request language not valid')
         result_submission_task.apply_async(
             args=[submission_id, Verdict.SYSTEM_ERROR, None, None, {'error': f'language {language} not support'}],
             queue='result')
@@ -33,16 +36,12 @@ def run_submission_task(submission_id, problem_id, manifest, code, language, tim
     try:
         validate_manifest(manifest)
     except TestCaseError as test_case_error:
-        if DDLCW_DEBUG:
-            print(
-                '--------------- validate test cases error ---------------')
-            traceback.print_exc()
+        logger.debug(test_case_error)
         if DDLCW_ENABLE_SYNC:
             # sync test cases
             result_submission_task.apply_async(args=[submission_id, Verdict.SYNC_TEST_CASES, None, None, {}],
                                                queue='result')
-            if DDLCW_DEBUG:
-                print('--------------- sync test cases ---------------')
+            logger.debug("sync test cases")
             try:
                 sync_test_cases(manifest['hash'], problem_id)
                 validate_manifest(manifest)
@@ -57,9 +56,7 @@ def run_submission_task(submission_id, problem_id, manifest, code, language, tim
                 args=[submission_id, Verdict.SYSTEM_ERROR, None, None, {'error': repr(test_case_error)}],
                 queue='result')
     except ManifestError as e:
-        if DDLCW_DEBUG:
-            print('--------------- validate manifest error ---------------')
-            traceback.print_exc()
+        logger.debug(e)
         result_submission_task.apply_async(args=[submission_id, Verdict.SYSTEM_ERROR, None, None, {'error': repr(e)}],
                                            queue='result')
         return
