@@ -7,6 +7,9 @@ services:
       - ~/data/upload/problem_test_cases:/judge/test_cases
     image: 4ddl/ddlcw
     container_name: ddl-judge-dev
+    build:
+      context: .
+      dockerfile: Dockerfile
     restart: always
     environment:
       - BACKEND_HOST=127.0.0.1

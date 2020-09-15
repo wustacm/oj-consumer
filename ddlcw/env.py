@@ -9,7 +9,7 @@ DDLCW_ENV = os.getenv('DDLCW_ENV', 'development')
 # request test cases token
 JUDGE_TOKEN = os.getenv('JUDGE_TOKEN', 'JUDGE_TOKEN')
 # RabbitMQ host
-RABBITMQ_HOST = os.getenv('RABBITMQ_USER', '127.0.0.1')
+RABBITMQ_HOST = os.getenv('RABBITMQ_HOST', '127.0.0.1')
 # RabbitMQ port
 RABBITMQ_PORT = os.getenv('RABBITMQ_PORT', 5672)
 # RabbitMQ user

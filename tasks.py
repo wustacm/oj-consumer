@@ -14,7 +14,6 @@ app.conf.update(
     broker_url=BROKER_URL,
     enable_utc=True,
     task_serializer='json',
-    timezone='UTC'
 )
 
 
