@@ -4,7 +4,7 @@ services:
     command: celery -A tasks worker -l info -Q judge
     volumes:
       - .:/app
-      - ~/data/judge-dev/test_cases:/judge/test_cases
+      - ~/data/upload/problem_test_cases:/judge/test_cases
     image: 4ddl/ddlcw
     container_name: ddl-judge-dev
     restart: always
