@@ -68,7 +68,8 @@ class Runner:
         os.chdir(self._runner_path)
         runner_env = compile_config.get("env", [])
         runner_env.append("PATH=" + os.getenv("PATH"))
-        runner_env.append("JAVA_OPTS=" + os.getenv("JAVA_OPTS"))
+        if os.getenv("JAVA_OPTS"):
+            runner_env.append("JAVA_OPTS=" + os.getenv("JAVA_OPTS"))
         spj_compile_result = runner.run(max_cpu_time=compile_config['max_cpu_time'],
                                         max_real_time=compile_config['max_real_time'],
                                         max_memory=compile_config['max_memory'],
