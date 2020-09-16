@@ -48,16 +48,16 @@ def run_submission_task(submission_id, problem_id, manifest, code, language, tim
             except ManifestError as e:
                 traceback.print_exc()
                 result_submission_task.apply_async(
-                    args=[submission_id, Verdict.SYSTEM_ERROR, None, None, {'error': repr(e)}], queue='result')
+                    args=[submission_id, Verdict.SYSTEM_ERROR, None, None, {'error': str(e)}], queue='result')
                 return
         else:
             # sync test cases disabled, return system error
             result_submission_task.apply_async(
-                args=[submission_id, Verdict.SYSTEM_ERROR, None, None, {'error': repr(test_case_error)}],
+                args=[submission_id, Verdict.SYSTEM_ERROR, None, None, {'error': str(test_case_error)}],
                 queue='result')
     except ManifestError as e:
         logger.debug(e)
-        result_submission_task.apply_async(args=[submission_id, Verdict.SYSTEM_ERROR, None, None, {'error': repr(e)}],
+        result_submission_task.apply_async(args=[submission_id, Verdict.SYSTEM_ERROR, None, None, {'error': str(e)}],
                                            queue='result')
         return
     try:
@@ -68,7 +68,7 @@ def run_submission_task(submission_id, problem_id, manifest, code, language, tim
                              code,
                              load_submission_config(language), load_spj_config('c'))
     except Exception as e:
-        result_submission_task.apply_async(args=[submission_id, Verdict.SYSTEM_ERROR, None, None, {'error': repr(e)}],
+        result_submission_task.apply_async(args=[submission_id, Verdict.SYSTEM_ERROR, None, None, {'error': str(e)}],
                                            queue='result')
         return
     # compile code
@@ -76,7 +76,7 @@ def run_submission_task(submission_id, problem_id, manifest, code, language, tim
         runner.compile()
     except Exception as e:
         traceback.print_exc()
-        result_submission_task.apply_async(args=[submission_id, Verdict.COMPILE_ERROR, None, None, {'error': repr(e)}],
+        result_submission_task.apply_async(args=[submission_id, Verdict.COMPILE_ERROR, None, None, {'error': str(e)}],
                                            queue='result')
         return
     # run code
@@ -84,20 +84,20 @@ def run_submission_task(submission_id, problem_id, manifest, code, language, tim
         result = runner.run()
         verdict = Verdict.ACCEPTED
         # attention: time spend and memory spend indicated maximum case time spend and maximum case memory spend
-        time_spend = 0
-        memory_spend = 0
+        time_cost = 0
+        memory_cost = 0
         for item in result:
             # calculate max time spend and memory spend
-            time_spend = max(time_spend, item['real_time'])
-            memory_spend = max(memory_spend, item['memory'])
+            time_spend = max(time_cost, item['cpu_time'])
+            memory_spend = max(memory_cost, item['memory'])
             if item['result'] != 0:
                 verdict = Verdict.VERDICT_MAPPING[item['result']]
                 break
-        result_submission_task.apply_async(args=[submission_id, verdict, time_spend, memory_spend, {'result': result}],
+        result_submission_task.apply_async(args=[submission_id, verdict, time_cost, memory_cost, {'result': result}],
                                            queue='result')
     except Exception as e:
         traceback.print_exc()
-        result_submission_task.apply_async(args=[submission_id, Verdict.SYSTEM_ERROR, None, None, {'error': repr(e)}],
+        result_submission_task.apply_async(args=[submission_id, Verdict.SYSTEM_ERROR, None, None, {'error': str(e)}],
                                            queue='result')
         return
     try:
