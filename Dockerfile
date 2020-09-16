@@ -33,6 +33,6 @@ RUN python -V > /config/python.info
 RUN pip3 config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
 RUN cd /tmp && git clone --depth=1 https://github.com/4ddl/ddlc && cd ddlc \
 	&& mkdir build && cd build && cmake .. && make && make install && apt-get clean && rm -rf /var/lib/apt/lists/* \
-	&& mkdir /runner && useradd -u 12001 code
+	&& mkdir /runner && useradd -u 12001 code && useradd -u 12002 spj_runner
 RUN pip3 install --no-cache-dir -r requirements.txt
 

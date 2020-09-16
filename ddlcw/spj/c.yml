@@ -9,7 +9,7 @@ compile:
 
 run:
   exe_name: "spj"
-  command: "{exe_path} {in_file_path} {user_out_file_path}"
+  command: "{exe_path} {in_file_path} {out_file_path} {user_out_file_path}"
   seccomp_rule: "c_cpp"
   env:
     - LANG=en_US.UTF-8
