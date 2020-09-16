@@ -125,6 +125,6 @@ def sync_test_cases(valid_hash, problem_id):
     for item in tmp_zip_file.namelist():
         with open(os.path.join(test_cases_dir, item), 'wb') as f:
             f.write(tmp_zip_file.read(item))
-        os.chmod(os.path.join(test_cases_dir,item), 0o640)
+        os.chmod(os.path.join(test_cases_dir, item), 0o640)
     tmp_zip_file.close()
     os.remove(tmp_file_path)

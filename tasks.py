@@ -88,8 +88,8 @@ def run_submission_task(submission_id, problem_id, manifest, code, language, tim
         memory_cost = 0
         for item in result:
             # calculate max time spend and memory spend
-            time_spend = max(time_cost, item['cpu_time'])
-            memory_spend = max(memory_cost, item['memory'])
+            time_cost = max(time_cost, item['cpu_time'])
+            memory_cost = max(memory_cost, item['memory'])
             if item['result'] != 0:
                 verdict = Verdict.VERDICT_MAPPING[item['result']]
                 break
