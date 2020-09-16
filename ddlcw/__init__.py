@@ -159,7 +159,7 @@ class Runner:
         run_out_file_path = os.path.join(self._runner_path, test_case['out'] + '.spj.out')
         run_out_err_path = os.path.join(self._runner_path, test_case['out'] + '.spj.err')
         run_result = runner.run(max_cpu_time=self._time_limit * 3,
-                                max_real_time=self._time_limit * 9,
+                                max_real_time=self._time_limit * 3,
                                 max_memory=self._memory_limit * 1024 * 1024,
                                 max_stack=128 * 1024 * 1024,
                                 max_output_size=1024 * 1024 * 16,
@@ -195,7 +195,7 @@ class Runner:
         seccomp_rule = self._run_config.get("seccomp_rule")
 
         run_result = runner.run(max_cpu_time=self._time_limit * 3,
-                                max_real_time=self._time_limit * 9,
+                                max_real_time=self._time_limit * 3,
                                 max_memory=self._memory_limit * 1024 * 1024,
                                 max_stack=128 * 1024 * 1024,
                                 max_output_size=1024 * 1024 * 16,
