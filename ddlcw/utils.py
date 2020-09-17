@@ -8,7 +8,8 @@ import requests
 import yaml
 from yaml import YAMLError
 
-from ddlcw.config import PROBLEM_TEST_CASES_DIR, BACKEND_SYNC_TEST_CASES_URL, TMP_DIR
+from ddlcw.config import PROBLEM_TEST_CASES_DIR, TMP_DIR
+from ddlcw.env import BACKEND_URL
 from ddlcw.env import JUDGE_TOKEN
 
 
@@ -107,7 +108,7 @@ def sync_test_cases(valid_hash, problem_id):
     tmp_file_name = f'{valid_hash}.zip'
     tmp_file_path = os.path.join(TMP_DIR, tmp_file_name)
     # request test cases zip file
-    problem_test_cases_url = BACKEND_SYNC_TEST_CASES_URL.format(problem_id=problem_id)
+    problem_test_cases_url = BACKEND_URL.format(problem_id=problem_id)
     res = requests.get(
         problem_test_cases_url,
         headers={'JudgeToken': JUDGE_TOKEN},

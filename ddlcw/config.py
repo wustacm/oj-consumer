@@ -6,8 +6,7 @@ import traceback
 
 from celery.utils.log import get_task_logger
 
-from ddlcw.env import DDLCW_ENV, RABBITMQ_HOST, RABBITMQ_PASS, RABBITMQ_PORT, \
-    RABBITMQ_USER, BACKEND_HOST, BACKEND_PORT, BACKEND_PROTOCOL, DDLCW_DEBUG
+from ddlcw.env import DDLCW_ENV, DDLCW_DEBUG
 
 UNLIMITED = -1
 
@@ -83,9 +82,6 @@ except Exception:
 RUN_USER_UID = pwd.getpwnam("code").pw_uid
 RUN_GROUP_GID = grp.getgrnam("code").gr_gid
 # tasks producer queue
-BROKER_URL = f"amqp://{RABBITMQ_USER}:{RABBITMQ_PASS}@{RABBITMQ_HOST}:{RABBITMQ_PORT}/"
-BACKEND_BASE_URL = f"{BACKEND_PROTOCOL}://{BACKEND_HOST}:{BACKEND_PORT}"
-BACKEND_SYNC_TEST_CASES_URL = BACKEND_BASE_URL + '/api/problem/{problem_id}/sync_test_cases/'
 simple_format = '[%(levelname)s][%(asctime)s][%(filename)s:%(lineno)d]%(message)s'
 LOG_CONFIG = {
     'version': 1,
@@ -97,17 +93,16 @@ LOG_CONFIG = {
         }
     },
     'handlers': {
-        'celery': {
-            # 'level': 'INFO',
-            # 'class': 'logging.handlers.RotatingFileHandler',
+        'console': {
             'level': 'DEBUG',
             'formatter': 'simple',
-            'class': 'logging.handlers.StreamHandler',
+            'class': 'logging.StreamHandler',
+            'stream': 'ext://sys.stdout'
         },
     },
     'loggers': {
         'myapp': {
-            'handlers': ['celery'],
+            'handlers': ['console'],
             'level': 'INFO' if not DDLCW_DEBUG else 'DEBUG',
             'propagate': True,
         }

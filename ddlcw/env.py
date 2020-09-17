@@ -8,20 +8,8 @@ DDLCW_ENABLE_SYNC = os.getenv('DDLCW_SYNC_ENABLE', 'False') == 'True'
 DDLCW_ENV = os.getenv('DDLCW_ENV', 'host')
 # request test cases token
 JUDGE_TOKEN = os.getenv('JUDGE_TOKEN', 'JUDGE_TOKEN')
-# RabbitMQ host
-RABBITMQ_HOST = os.getenv('RABBITMQ_HOST', '127.0.0.1')
-# RabbitMQ port
-RABBITMQ_PORT = os.getenv('RABBITMQ_PORT', 5672)
-# RabbitMQ user
-RABBITMQ_USER = os.getenv('RABBITMQ_USER', 'guest')
-# RabbitMQ user password
-RABBITMQ_PASS = os.getenv('RABBITMQ_PASS', 'guest')
-# BACKEND protocol
-BACKEND_PROTOCOL = os.getenv('BACKEND_PROTOCOL', 'http')
-# BACKEND host
-BACKEND_HOST = os.getenv('BACKEND_HOST', '127.0.0.1')
-# BACKEND port
-BACKEND_PORT = os.getenv('BACKEND_PORT', 8000)
 
-BROKER_URL = os.getenv('BROKER_URL')
-BACKEND_URL = os.getenv('BACKEND_URL')
+# celery broker url
+BROKER_URL = os.getenv('BROKER_URL', 'amqp://guest:guest@127.0.0.1:5672/')
+# celery request data url
+BACKEND_URL = os.getenv('BACKEND_URL', 'http://127.0.0.1') + '/api/problem/{problem_id}/sync_test_cases/'
