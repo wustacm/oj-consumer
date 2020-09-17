@@ -22,3 +22,6 @@ BACKEND_PROTOCOL = os.getenv('BACKEND_PROTOCOL', 'http')
 BACKEND_HOST = os.getenv('BACKEND_HOST', '127.0.0.1')
 # BACKEND port
 BACKEND_PORT = os.getenv('BACKEND_PORT', 8000)
+
+BROKER_URL = os.getenv('BROKER_URL')
+BACKEND_URL = os.getenv('BACKEND_URL')

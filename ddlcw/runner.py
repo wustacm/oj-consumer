@@ -64,5 +64,4 @@ def run(max_cpu_time,
     logger.debug(out)
     if err:
         logger.error(err)
-        raise ValueError("Error occurred while calling ddlc: {}".format(err))
     return json.loads(out.decode("utf-8"))

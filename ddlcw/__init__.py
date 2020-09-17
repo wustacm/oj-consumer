@@ -126,6 +126,7 @@ class Runner:
                             seccomp_rule_name=None,
                             uid=RUN_USER_UID,
                             gid=RUN_GROUP_GID)
+        os.chdir(self._original_dir)
         logger.debug(result)
         if result["result"] != Result.RESULT_SUCCESS:
             if os.path.exists(self._compiler_out):
@@ -264,9 +265,7 @@ class Runner:
         result = []
         for item in self._manifest['test_cases']:
             result.append(self._judge_single(item))
-        os.chdir(self._original_dir)
         return result
 
     def clean(self):
         shutil.rmtree(self._runner_path, ignore_errors=True)
-        os.chdir(self._original_dir)

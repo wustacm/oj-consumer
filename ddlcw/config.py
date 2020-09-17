@@ -7,7 +7,7 @@ import traceback
 from celery.utils.log import get_task_logger
 
 from ddlcw.env import DDLCW_ENV, RABBITMQ_HOST, RABBITMQ_PASS, RABBITMQ_PORT, \
-    RABBITMQ_USER, BACKEND_HOST, BACKEND_PORT, BACKEND_PROTOCOL
+    RABBITMQ_USER, BACKEND_HOST, BACKEND_PORT, BACKEND_PROTOCOL, DDLCW_DEBUG
 
 UNLIMITED = -1
 
@@ -86,14 +86,14 @@ RUN_GROUP_GID = grp.getgrnam("code").gr_gid
 BROKER_URL = f"amqp://{RABBITMQ_USER}:{RABBITMQ_PASS}@{RABBITMQ_HOST}:{RABBITMQ_PORT}/"
 BACKEND_BASE_URL = f"{BACKEND_PROTOCOL}://{BACKEND_HOST}:{BACKEND_PORT}"
 BACKEND_SYNC_TEST_CASES_URL = BACKEND_BASE_URL + '/api/problem/{problem_id}/sync_test_cases/'
-
+simple_format = '[%(levelname)s][%(asctime)s][%(filename)s:%(lineno)d]%(message)s'
 LOG_CONFIG = {
     'version': 1,
     'disable_existing_loggers': False,
     'formatters': {
         'simple': {
             # 'datefmt': '%m-%d-%Y %H:%M:%S'
-            'format': '%(asctime)s \"%(pathname)s：%(module)s:%(funcName)s:%(lineno)d\" [%(levelname)s]- %(message)s'
+            'format': simple_format
         }
     },
     'handlers': {
@@ -102,16 +102,13 @@ LOG_CONFIG = {
             # 'class': 'logging.handlers.RotatingFileHandler',
             'level': 'DEBUG',
             'formatter': 'simple',
-            'class': 'logging.handlers.TimedRotatingFileHandler',
-            'filename': 'your_name.log',
-            'when': 'midnight',
-            'encoding': 'utf-8',
+            'class': 'logging.handlers.StreamHandler',
         },
     },
     'loggers': {
         'myapp': {
             'handlers': ['celery'],
-            'level': 'INFO',
+            'level': 'INFO' if not DDLCW_DEBUG else 'DEBUG',
             'propagate': True,
         }
     }
