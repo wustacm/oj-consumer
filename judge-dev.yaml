@@ -15,3 +15,4 @@ services:
       - BROKER_URL=amqp://guest:guest@127.0.0.1:5672/
       - DDLCW_DEBUG=True
       - DDLCW_SYNC_ENABLE=True
+      - JUDGE_TOKEN=JUDGE_TOKEN
