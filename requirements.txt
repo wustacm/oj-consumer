@@ -3,3 +3,5 @@ celery
 pyyaml
 requests
 flake8
+sentry-sdk
+

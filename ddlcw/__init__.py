@@ -37,8 +37,10 @@ class Runner:
             os.makedirs(self._runner_path)
             os.chown(self._runner_path, RUN_USER_UID,
                      RUN_GROUP_GID)
-        self._compiler_out = '/dev/stderr'
-        self._compiler_log = '/dev/stdout'
+        self._compiler_out = os.path.join(self._runner_path, 'compile.out')
+        self._compiler_spj_out = os.path.join(self._runner_path, 'compile_spj.out')
+        self._compiler_log = os.path.join(self._runner_path, 'compile.log')
+        self._compiler_spj_log = os.path.join(self._runner_path, 'compile_spj.log')
         self._spj = False
         self._spj_lang = 'c'
         self._spj_code = ''
@@ -78,8 +80,8 @@ class Runner:
                                         max_process_number=UNLIMITED,
                                         exe_path=_command[0],
                                         input_path=self._spj_src_path,
-                                        output_path=self._compiler_out,
-                                        error_path=self._compiler_out,
+                                        output_path=self._compiler_spj_out,
+                                        error_path=self._compiler_spj_out,
                                         args=_command[1::],
                                         env=runner_env,
                                         log_path=self._compiler_log,
@@ -126,18 +128,19 @@ class Runner:
                             seccomp_rule_name=None,
                             uid=RUN_USER_UID,
                             gid=RUN_GROUP_GID)
+        logger.debug('compile result:' + str(result))
         os.chdir(self._original_dir)
-        logger.debug(result)
         if result["result"] != Result.RESULT_SUCCESS:
             if os.path.exists(self._compiler_out):
                 with open(self._compiler_out, encoding="utf-8") as f:
                     error = f.read().strip()
+                    logger.debug(error)
                     if error:
                         raise CompileError(error)
             raise CompileError(
                 "Compiler runtime error, info: \n%s\n" % json.dumps(result))
         else:
-            return self._exe_path
+            return result
 
     # 运行单个测试样例的SPJ代码
 

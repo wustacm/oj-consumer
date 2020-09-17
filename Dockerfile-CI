@@ -2,6 +2,7 @@ FROM ubuntu:20.04
 
 LABEL maintainer="xudian.cn@gmail.com"
 
+ENV ENABLE_SENTRY=True
 ENV TZ=UTC
 ENV SDKMAN_DIR="/usr/local/sdkman"
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone

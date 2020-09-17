@@ -1,6 +1,6 @@
 import traceback
-
 from celery import Celery
+from celery.signals import setup_logging
 
 from ddlcw import Runner as JudgeRunner
 from ddlcw.config import Verdict, PROBLEM_TEST_CASES_DIR
@@ -10,13 +10,21 @@ from ddlcw.languages import ACCEPT_SUBMISSION_LANGUAGES
 from ddlcw.utils import load_spj_config, load_submission_config, validate_manifest, ManifestError, TestCaseError, \
     sync_test_cases
 
+import sentry_sdk
+from sentry_sdk.integrations.celery import CeleryIntegration
+
+sentry_sdk.init(dsn='https://5e1c2c755d414a0b87c2d9e8d763c1b3@o428533.ingest.sentry.io/5432217', integrations=[CeleryIntegration()])
+
+
 app = Celery('tasks')
 app.conf.update(
     broker_url=BROKER_URL,
     enable_utc=True,
     task_serializer='json',
 )
-
+@setup_logging.connect
+def setup_selery_logger(*args, **kwargs):
+    pass
 
 @app.task(name='result_submission_task')
 def result_submission_task(submission_id, verdict, time_spend, memory_spend, additional_info):
@@ -73,9 +81,10 @@ def run_submission_task(submission_id, problem_id, manifest, code, language, tim
         return
     # compile code
     try:
-        runner.compile()
+        res_compile = runner.compile()
+        logger.debug('compile result:'+str(res_compile))
     except Exception as e:
-        traceback.print_exc()
+        logger.debug('compile error:'+str(e))
         result_submission_task.apply_async(args=[submission_id, Verdict.COMPILE_ERROR, None, None, {'error': str(e)}],
                                            queue='result')
         return
