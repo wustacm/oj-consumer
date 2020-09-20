@@ -4,9 +4,9 @@ import shutil
 import subprocess
 import uuid
 
-from ddlcw import runner
-from ddlcw.config import Result, RUN_USER_UID, RUN_GROUP_GID, RUNNER_DIR, UNLIMITED, logger
-from ddlcw.exceptions import CompileError
+from core import runner
+from core.config import Result, RUN_USER_UID, RUN_GROUP_GID, RUNNER_DIR, UNLIMITED, logger
+from core.exceptions import CompileError
 
 
 class Runner:

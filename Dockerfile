@@ -6,14 +6,14 @@ ENV ENABLE_SENTRY=True
 ENV TZ=UTC
 ENV SDKMAN_DIR="/usr/local/sdkman"
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-ENV DDLCW_ENV container
-ENV DDLCW_SYNC_ENABLE False
+ENV OJ_ENV container
+ENV OJ_SYNC_ENABLE False
 ADD . /app
 WORKDIR /app
 RUN sed -i 's/archive.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list
 RUN apt-get update
 RUN apt-get -y install curl zip unzip python3 python3-dev python3-pip gcc g++ libseccomp-dev cmake git software-properties-common python-is-python3 \
-	golang-go
+	golang-go python3-venv
 RUN curl -s "https://get.sdkman.io" | bash
 RUN chmod a+x "$SDKMAN_DIR/bin/sdkman-init.sh"
 RUN bash -c "source $SDKMAN_DIR/bin/sdkman-init.sh && sdk ls java && sdk install java 14.0.2.fx-librca && sdk ls kotlin && sdk install kotlin"
@@ -32,8 +32,9 @@ RUN g++ -v 2> /config/g++.info
 RUN go version > /config/go.info
 RUN python -V > /config/python.info
 RUN pip3 config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
-RUN cd /tmp && git clone --depth=1 https://github.com/4ddl/ddlc && cd ddlc \
+RUN cd /tmp && git clone --depth=1 https://github.com/wustacm/oj-core.git && cd oj-core \
 	&& mkdir build && cd build && cmake .. && make && make install && apt-get clean && rm -rf /var/lib/apt/lists/* \
 	&& mkdir /runner && useradd -u 12001 code && useradd -u 12002 spj_runner
 RUN pip3 install --no-cache-dir -r requirements.txt
-
+# create virtual env
+RUN python -m venv /opt/venv

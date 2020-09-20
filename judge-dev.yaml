@@ -1,10 +1,10 @@
 version: "3"
 services:
-  ddl-judge-dev:
+  oj-judge-dev:
     command: celery -A tasks worker -l info -Q judge
     volumes:
-      - ~/data/ddl-backend/test_cases:/judge/test_cases
-    image: 4ddl/ddlcw
+      - ~/data/oj-backend/test_cases:/judge/test_cases
+    image: wustacm/oj-consumer
     build:
       context: .
       dockerfile: Dockerfile
@@ -13,6 +13,6 @@ services:
     environment:
       - BACKEND_URL=http://127.0.0.1
       - BROKER_URL=amqp://guest:guest@127.0.0.1:5672/
-      - DDLCW_DEBUG=True
-      - DDLCW_SYNC_ENABLE=True
+      - OJ_DEBUG=True
+      - OJ_SYNC_ENABLE=True
       - JUDGE_TOKEN=JUDGE_TOKEN
