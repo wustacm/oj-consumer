@@ -84,7 +84,7 @@ def validate_manifest(manifest):
 
 
 def load_submission_config(lang):
-    with open(f"ddlcw/languages/{lang}.yml", 'r') as f:
+    with open(f"core/languages/{lang}.yml", 'r') as f:
         result = f.read()
     try:
         return yaml.load(result, yaml.SafeLoader)
@@ -94,7 +94,7 @@ def load_submission_config(lang):
 
 
 def load_spj_config(lang):
-    with open(f"ddlcw/spj/{lang}.yml", 'r') as f:
+    with open(f"core/spj/{lang}.yml", 'r') as f:
         result = f.read()
     try:
         return yaml.load(result, yaml.SafeLoader)
