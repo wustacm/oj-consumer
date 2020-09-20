@@ -1,7 +1,7 @@
 import json
 import subprocess
 
-from ddlcw.config import UNLIMITED, logger
+from core.config import UNLIMITED, logger
 
 
 def run(max_cpu_time,

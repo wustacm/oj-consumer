@@ -6,7 +6,7 @@ import traceback
 
 from celery.utils.log import get_task_logger
 
-from ddlcw.env import DDLCW_ENV, DDLCW_DEBUG
+from core.env import OJ_ENV, OJ_DEBUG
 
 UNLIMITED = -1
 
@@ -60,7 +60,7 @@ class Verdict:
     }
 
 
-if DDLCW_ENV != 'container':
+if OJ_ENV != 'container':
     BASE_DIR = os.path.abspath('./judge')
     TMP_DIR = os.path.join(BASE_DIR, 'tmp')
 else:
@@ -103,7 +103,7 @@ LOG_CONFIG = {
     'loggers': {
         'myapp': {
             'handlers': ['console'],
-            'level': 'INFO' if not DDLCW_DEBUG else 'DEBUG',
+            'level': 'INFO' if not OJ_DEBUG else 'DEBUG',
             'propagate': True,
         }
     }

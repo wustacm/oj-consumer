@@ -1,0 +1,17 @@
+compile:
+  src_name: "spj.cpp"
+  exe_name: "spj"
+  max_cpu_time: 3000
+  max_real_time: 5000
+  # 1GB
+  max_memory: 1073741824
+  compile_command: "/usr/bin/g++ -DONLINE_JUDGE -O2 -w -fmax-errors=3 -std=c11 {src_path} -lm -o {exe_path}"
+
+run:
+  exe_name: "spj"
+  command: "{exe_path} {in_file_path} {out_file_path} {user_out_file_path}"
+  seccomp_rule: "c_cpp"
+  env:
+    - LANG=en_US.UTF-8
+    - LANGUAGE=en_US:en
+    - LC_ALL=en_US.UTF-8

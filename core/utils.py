@@ -8,9 +8,9 @@ import requests
 import yaml
 from yaml import YAMLError
 
-from ddlcw.config import PROBLEM_TEST_CASES_DIR, TMP_DIR
-from ddlcw.env import BACKEND_URL
-from ddlcw.env import JUDGE_TOKEN
+from core.config import PROBLEM_TEST_CASES_DIR, TMP_DIR
+from core.env import BACKEND_URL
+from core.env import JUDGE_TOKEN
 
 
 class ManifestError(Exception):

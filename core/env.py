@@ -1,11 +1,11 @@
 import os
 
 # debug log
-DDLCW_DEBUG = os.getenv('DDLCW_DEBUG', 'False') == 'True'
+OJ_DEBUG = os.getenv('OJ_DEBUG', 'False') == 'True'
 # enable test cases sync
-DDLCW_ENABLE_SYNC = os.getenv('DDLCW_SYNC_ENABLE', 'False') == 'True'
+OJ_ENABLE_SYNC = os.getenv('OJ_SYNC_ENABLE', 'False') == 'True'
 # is development or production
-DDLCW_ENV = os.getenv('DDLCW_ENV', 'host')
+OJ_ENV = os.getenv('OJ_ENV', 'host')
 # request test cases token
 JUDGE_TOKEN = os.getenv('JUDGE_TOKEN', 'JUDGE_TOKEN')
 

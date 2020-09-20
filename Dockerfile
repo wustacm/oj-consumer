@@ -6,8 +6,8 @@ ENV ENABLE_SENTRY=True
 ENV TZ=UTC
 ENV SDKMAN_DIR="/usr/local/sdkman"
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-ENV DDLCW_ENV container
-ENV DDLCW_SYNC_ENABLE False
+ENV OJ_ENV container
+ENV OJ_SYNC_ENABLE False
 ADD . /app
 WORKDIR /app
 RUN sed -i 's/archive.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list
@@ -32,8 +32,9 @@ RUN g++ -v 2> /config/g++.info
 RUN go version > /config/go.info
 RUN python -V > /config/python.info
 RUN pip3 config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
-RUN cd /tmp && git clone --depth=1 https://github.com/4ddl/ddlc && cd ddlc \
+RUN cd /tmp && git clone --depth=1 https://github.com/wustacm/oj-core.git && cd oj-core \
 	&& mkdir build && cd build && cmake .. && make && make install && apt-get clean && rm -rf /var/lib/apt/lists/* \
 	&& mkdir /runner && useradd -u 12001 code && useradd -u 12002 spj_runner
 RUN pip3 install --no-cache-dir -r requirements.txt
-
+# create virtual env
+RUN python -m venv /opt/venv
