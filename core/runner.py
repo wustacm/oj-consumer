@@ -28,7 +28,7 @@ def run(max_cpu_time,
     str_vars = ["exe_path", "input_path",
                 "output_path", "error_path", "log_path"]
 
-    proc_args = ["ddlc"]
+    proc_args = ["measure"]
 
     for var in str_list_vars:
         value = vars()[var]
