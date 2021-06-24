@@ -1,4 +1,4 @@
-FROM ubuntu:21.04
+FROM ubuntu:21.10
 
 LABEL maintainer="xudian.cn@gmail.com"
 
@@ -13,7 +13,7 @@ WORKDIR /app
 RUN sed -i 's/archive.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list
 RUN apt-get update
 RUN apt-get -y install curl zip unzip python3 python3-dev python3-pip gcc g++ libseccomp-dev cmake git software-properties-common python-is-python3 \
-	golang-go python3-venv
+	golang-go python3-venv clang
 RUN curl -s "https://get.sdkman.io" | bash
 RUN chmod a+x "$SDKMAN_DIR/bin/sdkman-init.sh"
 RUN bash -c "source $SDKMAN_DIR/bin/sdkman-init.sh && sdk ls java && sdk install java 16.0.1.fx-librca && sdk ls kotlin && sdk install kotlin"
