@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:21.04
 
 LABEL maintainer="xudian.cn@gmail.com"
 
@@ -16,7 +16,7 @@ RUN apt-get -y install curl zip unzip python3 python3-dev python3-pip gcc g++ li
 	golang-go python3-venv
 RUN curl -s "https://get.sdkman.io" | bash
 RUN chmod a+x "$SDKMAN_DIR/bin/sdkman-init.sh"
-RUN bash -c "source $SDKMAN_DIR/bin/sdkman-init.sh && sdk ls java && sdk install java 14.0.2.fx-librca && sdk ls kotlin && sdk install kotlin"
+RUN bash -c "source $SDKMAN_DIR/bin/sdkman-init.sh && sdk ls java && sdk install java 16.0.1.fx-librca && sdk ls kotlin && sdk install kotlin"
 # "OpenJDK 64-Bit Server VM warning: Options -Xverify:none and -noverify
 # were deprecated in JDK 13 and will likely be removed in a future release."
 # so only add -noverify for older versions
