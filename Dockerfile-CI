@@ -19,7 +19,7 @@ RUN bash -c "source $SDKMAN_DIR/bin/sdkman-init.sh && sdk ls java && sdk install
 # "OpenJDK 64-Bit Server VM warning: Options -Xverify:none and -noverify
 # were deprecated in JDK 13 and will likely be removed in a future release."
 # so only add -noverify for older versions
-RUN sed -i "/noverify/d" /usr/local/sdkman/candidates/kotlin/current/bin/kotlinc
+# RUN sed -i "/noverify/d" /usr/local/sdkman/candidates/kotlin/current/bin/kotlinc
 ENV JAVA_HONE=/usr/local/sdkman/candidates/java/current
 ENV PATH=${PATH}:/usr/local/sdkman/candidates/kotlin/current/bin:/usr/local/sdkman/candidates/java/current/bin
 RUN echo $PATH
