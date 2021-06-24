@@ -8,7 +8,7 @@ compile:
   compile_command: "/usr/bin/go build -o {exe_path} {src_path}"
   env:
     - GOCACHE=/tmp
-
+    - GOPATH=/root/go
 run:
   command: "{exe_path}"
   env:
@@ -17,4 +17,5 @@ run:
     - LC_ALL=en_US.UTF-8
     - GODEBUG=madvdontneed=1
     - GOCACHE=off
+    - GOPATH=/root/go
   memory_limit_check_only: 1
